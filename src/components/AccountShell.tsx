@@ -74,10 +74,10 @@ export default function AccountShell({
       <footer className="flex flex-col gap-6 px-6 py-6 text-[12px] text-[#9aa0a6] md:flex-row md:items-start md:justify-between md:px-8">
         <div className="flex flex-col gap-3">
           <div className="flex gap-6">
-            <a href="#" className="hover:underline">
+            <a href="/privacy" className="hover:underline">
               Privacy
             </a>
-            <a href="#" className="hover:underline">
+            <a href="/terms" className="hover:underline">
               Terms
             </a>
           </div>

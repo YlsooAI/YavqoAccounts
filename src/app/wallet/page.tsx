@@ -208,6 +208,14 @@ export default async function WalletPage({
             notice={cardNotice}
           />
         </section>
+
+        <Link
+          href="/invoices"
+          className="mt-6 block rounded-2xl border border-[#3c4043] px-6 py-4 text-[14px] transition-colors hover:bg-white/5"
+        >
+          View payment history and invoices
+          <span className="text-[#9aa0a6]"> →</span>
+        </Link>
       </div>
     </AccountShell>
   );

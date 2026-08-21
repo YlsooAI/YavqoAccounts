@@ -16,6 +16,7 @@ import {
   Network,
   Package,
   Pencil,
+  Receipt,
   ToggleLeft,
   Tv,
   User,
@@ -82,6 +83,15 @@ const navItems: NavNode[] = [
     href: "/wallet",
     icon: Wallet,
     color: "#c58af9",
+    children: [
+      { key: "wallet", label: "Wallet", href: "/wallet", icon: Wallet },
+      {
+        key: "invoices",
+        label: "Invoices",
+        href: "/invoices",
+        icon: Receipt,
+      },
+    ],
   },
   {
     key: "personal",
