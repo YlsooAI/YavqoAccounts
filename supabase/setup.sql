@@ -40,6 +40,14 @@ create policy "Users can replace their own avatar"
 -- 3) profiles RLS: users can only see/modify their own row.
 alter table public.profiles enable row level security;
 
+-- Postgres grants are checked before RLS. Grant the authenticated role the
+-- operations used by the app, then let the owner-only policies below decide
+-- which rows are accessible. This also repairs projects where automatic Data
+-- API grants are disabled and PostgREST reports "permission denied for view
+-- profiles".
+revoke all on table public.profiles from anon;
+grant select, insert, update on table public.profiles to authenticated;
+
 drop policy if exists "Users can read own profile" on public.profiles;
 create policy "Users can read own profile"
   on public.profiles for select
