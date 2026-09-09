@@ -511,13 +511,13 @@ begin
     raise exception 'at least one redirect URI is required';
   end if;
 
-  v_client_id := 'yvc_' || encode(gen_random_bytes(12), 'hex');
-  v_secret := 'yvs_' || encode(gen_random_bytes(24), 'hex');
+  v_client_id := 'yvc_' || encode(extensions.gen_random_bytes(12), 'hex');
+  v_secret := 'yvs_' || encode(extensions.gen_random_bytes(24), 'hex');
 
   insert into public.id_oauth_clients
     (user_id, client_id, client_secret_hash, name, redirect_uris)
   values
-    (auth.uid(), v_client_id, crypt(v_secret, gen_salt('bf')),
+    (auth.uid(), v_client_id, extensions.crypt(v_secret, extensions.gen_salt('bf')),
      trim(p_name), p_redirect_uris);
 
   return jsonb_build_object(
@@ -568,7 +568,7 @@ begin
   end if;
   if v_client.client_secret_hash is not null then
     if p_client_secret is null
-      or crypt(p_client_secret, v_client.client_secret_hash)
+      or extensions.crypt(p_client_secret, v_client.client_secret_hash)
          <> v_client.client_secret_hash then
       raise exception 'invalid_client';
     end if;
@@ -601,7 +601,7 @@ begin
     if v_challenge_method = 'S256' then
       -- RFC 7636: BASE64URL(SHA256(verifier)), unpadded.
       v_expected := replace(replace(replace(
-        encode(digest(p_code_verifier, 'sha256'), 'base64'),
+        encode(extensions.digest(p_code_verifier, 'sha256'), 'base64'),
         '+', '-'), '/', '_'), '=', '');
       if v_expected <> v_challenge then
         raise exception 'invalid_grant';
