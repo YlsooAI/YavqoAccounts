@@ -1,4 +1,5 @@
 export const ACCOUNT_QUOTA_BYTES = 1 * 1024 * 1024 * 1024; // 1 GB
+export const MAX_FILE_BYTES = 50 * 1024 * 1024; // 50 MB per file
 
 export function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
@@ -19,4 +20,15 @@ export function rowBytes(value: unknown): number {
   } catch {
     return 0;
   }
+}
+
+export function safeFileName(name: string): string {
+  const trimmed = name.trim().replace(/\s+/g, "-");
+  const cleaned = trimmed.replace(/[^a-zA-Z0-9._-]/g, "");
+  return cleaned.slice(0, 120) || "file";
+}
+
+export function displayNameFromPath(path: string): string {
+  const base = path.split("/").pop() ?? path;
+  return base.replace(/^\d+-/, "");
 }
