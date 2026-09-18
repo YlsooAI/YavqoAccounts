@@ -1,4 +1,4 @@
-import { ChevronRight, Contact, KeyRound, ShieldCheck } from "lucide-react";
+import { ChevronRight, Contact, KeyRound, ShieldCheck, Trash2 } from "lucide-react";
 import AccountShell from "@/components/AccountShell";
 import DataExportButton from "@/components/DataExportButton";
 import DeleteDataCard from "@/components/DeleteDataCard";
@@ -47,7 +47,7 @@ export default async function PrivacyPage() {
   return (
     <AccountShell active="privacy" user={user}>
       <div className="mx-auto max-w-[660px] pt-6 md:pt-10">
-        <h2 className="text-[24px] font-normal">Data &amp; privacy</h2>
+        <h2 className="text-[24px] font-normal">Data & privacy</h2>
         <p className="mt-2 text-[13px] text-[#9aa0a6]">
           See what data is saved to your Yavqo Account, download it, or delete
           it. Only you can see these settings.
@@ -110,6 +110,22 @@ export default async function PrivacyPage() {
           </div>
 
           <DeleteDataCard userId={user.id} />
+
+          <a
+            href="/account/delete"
+            className="flex items-center justify-between gap-4 border-t border-[#3c4043] py-4 transition-opacity hover:opacity-80"
+          >
+            <div className="flex items-start gap-3">
+              <Trash2 size={16} className="mt-0.5 text-[#f28b82]" aria-hidden="true" />
+              <div>
+                <p className="text-[14px]">Delete your Yavqo Account</p>
+                <p className="mt-0.5 text-[13px] text-[#9aa0a6]">
+                  Permanently close this account and erase account data.
+                </p>
+              </div>
+            </div>
+            <ChevronRight size={18} className="shrink-0 text-[#9aa0a6]" aria-hidden="true" />
+          </a>
         </section>
 
         <p className="mt-6 flex items-start gap-2 text-[12px] leading-relaxed text-[#9aa0a6]">
