@@ -18,6 +18,7 @@ import {
   Pencil,
   Receipt,
   ToggleLeft,
+  Trash2,
   Tv,
   User,
   UserSearch,
@@ -118,7 +119,22 @@ const navItems: NavNode[] = [
   { key: "security", label: "Security & sign-in", href: "/security", icon: Lock, color: "#8ab4f8" },
   { key: "password", label: "Yavqo Password", href: "/password", icon: KeyRound, color: "#8ab4f8" },
   { key: "apps", label: "Connected apps", href: "/apps", icon: Network, color: "#8ab4f8" },
-  { key: "privacy", label: "Data & privacy", href: "/privacy", icon: ToggleLeft, color: "#fcad70" },
+  {
+    key: "privacy",
+    label: "Data & privacy",
+    href: "/privacy",
+    icon: ToggleLeft,
+    color: "#fcad70",
+    children: [
+      { key: "privacy", label: "Your data", href: "/privacy", icon: ToggleLeft },
+      {
+        key: "delete-account",
+        label: "Delete account",
+        href: "/account/delete",
+        icon: Trash2,
+      },
+    ],
+  },
   { key: "contacts", label: "Contacts & sharing", href: "/contacts", icon: Contact, color: "#ff8bcb" },
   { key: "storage", label: "Account storage", href: "/storage", icon: Cloud, color: "#c58af9" },
 ];
