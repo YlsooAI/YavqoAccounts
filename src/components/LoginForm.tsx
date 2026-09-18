@@ -16,6 +16,7 @@ export default function LoginForm() {
   const [loading, setLoading] = useState(false);
 
   const confirmationFailed = searchParams.get("error") === "confirmation-failed";
+  const accountDeleted = searchParams.get("deleted") === "1";
 
   // Resume an OAuth authorize request (or other internal page) after login.
   const nextParam = searchParams.get("next");
@@ -107,6 +108,11 @@ export default function LoginForm() {
 
           {error && <p className="text-[13px] text-[#f28b82]">{error}</p>}
           {notice && <p className="text-[13px] text-[#81c995]">{notice}</p>}
+          {accountDeleted && !error && !notice && (
+            <p className="text-[13px] text-[#81c995]">
+              Your Yavqo Account has been deleted.
+            </p>
+          )}
           {confirmationFailed && !error && (
             <p className="text-[13px] text-[#f28b82]">
               Email confirmation failed or expired. Try signing in again.
