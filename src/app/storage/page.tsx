@@ -1,13 +1,5 @@
-import {
-  Contact,
-  Fingerprint,
-  Image as ImageIcon,
-  KeyRound,
-  Network,
-  Users,
-} from "lucide-react";
 import AccountShell from "@/components/AccountShell";
-import StorageBoard from "@/components/StorageBoard";
+import StorageBoard, { type StaticBucket } from "@/components/StorageBoard";
 import { getAccountUser } from "@/lib/account";
 import { createClient } from "@/lib/supabase/server";
 import { rowBytes } from "@/lib/storageUsage";
@@ -64,10 +56,10 @@ export default async function StoragePage() {
   const idBytes = ids.reduce((sum, row) => sum + rowBytes(row), 0);
   const familyBytes = family.reduce((sum, row) => sum + rowBytes(row), 0);
 
-  const otherBuckets = [
+  const otherBuckets: StaticBucket[] = [
     {
       href: "/personal/photo",
-      icon: ImageIcon,
+      icon: "photo",
       color: "#81c995",
       title: "Photos & avatars",
       items:
@@ -76,7 +68,7 @@ export default async function StoragePage() {
     },
     {
       href: "/password",
-      icon: KeyRound,
+      icon: "password",
       color: "#8ab4f8",
       title: "Yavqo Password",
       items:
@@ -87,7 +79,7 @@ export default async function StoragePage() {
     },
     {
       href: "/contacts",
-      icon: Contact,
+      icon: "contacts",
       color: "#ff8bcb",
       title: "Contacts",
       items:
@@ -96,7 +88,7 @@ export default async function StoragePage() {
     },
     {
       href: "/apps",
-      icon: Network,
+      icon: "apps",
       color: "#8ab4f8",
       title: "Connected apps",
       items:
@@ -107,7 +99,7 @@ export default async function StoragePage() {
     },
     {
       href: "/yavqoid",
-      icon: Fingerprint,
+      icon: "yavqoid",
       color: "#8b5cf6",
       title: "YavqoID",
       items: ids.length ? "Profile on file" : "Not set up",
@@ -115,7 +107,7 @@ export default async function StoragePage() {
     },
     {
       href: "/family",
-      icon: Users,
+      icon: "family",
       color: "#8ab4f8",
       title: "Family",
       items: family.length ? "Family membership" : "No family group",
