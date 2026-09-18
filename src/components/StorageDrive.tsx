@@ -78,9 +78,11 @@ function uploadWithProgress(
 export default function StorageDrive({
   userId,
   otherBytes,
+  onUsageChange,
 }: {
   userId: string;
   otherBytes: number;
+  onUsageChange?: (bytes: number, count: number) => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const toastId = useRef(0);
@@ -93,6 +95,10 @@ export default function StorageDrive({
   const driveBytes = files.reduce((sum, file) => sum + file.size, 0);
   const remaining = Math.max(0, ACCOUNT_QUOTA_BYTES - otherBytes - driveBytes);
   const uploading = jobs.length > 0;
+
+  useEffect(() => {
+    onUsageChange?.(driveBytes, files.length);
+  }, [driveBytes, files.length, onUsageChange]);
 
   function pushToast(kind: ToastItem["kind"], message: string) {
     const id = ++toastId.current;
