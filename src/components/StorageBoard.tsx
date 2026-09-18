@@ -1,15 +1,32 @@
 "use client";
 
-import { useState } from "react";
-import type { LucideIcon } from "lucide-react";
-import { ChevronRight, Folder } from "lucide-react";
+import { useCallback, useState } from "react";
+import {
+  ChevronRight,
+  Contact,
+  Fingerprint,
+  Folder,
+  Image as ImageIcon,
+  KeyRound,
+  Network,
+  Users,
+} from "lucide-react";
 import StorageDrive from "@/components/StorageDrive";
 import StorageUsageCard from "@/components/StorageUsageCard";
 import { formatBytes } from "@/lib/storageUsage";
 
+const ICONS = {
+  photo: ImageIcon,
+  password: KeyRound,
+  contacts: Contact,
+  apps: Network,
+  yavqoid: Fingerprint,
+  family: Users,
+} as const;
+
 export type StaticBucket = {
   href?: string;
-  icon: LucideIcon;
+  icon: keyof typeof ICONS;
   color: string;
   title: string;
   items: string;
@@ -32,16 +49,18 @@ export default function StorageBoard({
   const [driveBytes, setDriveBytes] = useState(initialDriveBytes);
   const [driveCount, setDriveCount] = useState(initialDriveCount);
 
+  const onUsageChange = useCallback((bytes: number, count: number) => {
+    setDriveBytes(bytes);
+    setDriveCount(count);
+  }, []);
+
   return (
     <>
       <StorageUsageCard usedBytes={otherBytes + driveBytes} />
       <StorageDrive
         userId={userId}
         otherBytes={otherBytes}
-        onUsageChange={(bytes, count) => {
-          setDriveBytes(bytes);
-          setDriveCount(count);
-        }}
+        onUsageChange={onUsageChange}
       />
       <h3 className="mt-10 text-[15px] font-medium text-[#9aa0a6]">
         Storage breakdown
@@ -62,17 +81,14 @@ export default function StorageBoard({
           </span>
         </div>
         {otherBuckets.map((bucket) => {
+          const Icon = ICONS[bucket.icon] ?? Folder;
           const inner = (
             <>
               <span
                 className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full"
                 style={{ backgroundColor: bucket.color }}
               >
-                <bucket.icon
-                  size={18}
-                  className="text-[#1f1f1f]"
-                  aria-hidden="true"
-                />
+                <Icon size={18} className="text-[#1f1f1f]" aria-hidden="true" />
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-[14px]">{bucket.title}</span>
