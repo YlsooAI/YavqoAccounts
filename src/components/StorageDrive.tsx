@@ -11,6 +11,8 @@ import {
   X,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { getSupabaseEnv } from "@/lib/supabase/env";
+import ToastStack, { type ToastItem } from "@/components/Toast";
 import {
   ACCOUNT_QUOTA_BYTES,
   MAX_FILE_BYTES,
@@ -27,6 +29,11 @@ type DriveFile = {
   updatedAt: string | null;
 };
 
+type UploadJob = {
+  name: string;
+  percent: number;
+};
+
 function kindOf(mime: string, name: string): "image" | "video" | "other" {
   if (mime.startsWith("image/") || /\.(png|jpe?g|gif|webp|avif|svg|bmp|heic)$/i.test(name)) {
     return "image";
@@ -37,6 +44,37 @@ function kindOf(mime: string, name: string): "image" | "video" | "other" {
   return "other";
 }
 
+function uploadWithProgress(
+  path: string,
+  file: File,
+  accessToken: string,
+  onProgress: (percent: number) => void
+): Promise<void> {
+  const { url, key } = getSupabaseEnv();
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", `${url.replace(/\/$/, "")}/storage/v1/object/files/${path}`);
+    xhr.setRequestHeader("Authorization", `Bearer ${accessToken}`);
+    xhr.setRequestHeader("apikey", key);
+    xhr.setRequestHeader("x-upsert", "false");
+    if (file.type) xhr.setRequestHeader("Content-Type", file.type);
+    xhr.upload.onprogress = (event) => {
+      if (!event.lengthComputable) return;
+      onProgress(Math.round((event.loaded / event.total) * 100));
+    };
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        onProgress(100);
+        resolve();
+      } else {
+        reject(new Error(xhr.responseText || `Upload failed (${xhr.status})`));
+      }
+    };
+    xhr.onerror = () => reject(new Error("Network error while uploading."));
+    xhr.send(file);
+  });
+}
+
 export default function StorageDrive({
   userId,
   otherBytes,
@@ -45,29 +83,33 @@ export default function StorageDrive({
   otherBytes: number;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const toastId = useRef(0);
   const [files, setFiles] = useState<DriveFile[]>([]);
   const [loading, setLoading] = useState(true);
-  const [uploading, setUploading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [preview, setPreview] = useState<{
-    file: DriveFile;
-    url: string;
-  } | null>(null);
+  const [jobs, setJobs] = useState<UploadJob[]>([]);
+  const [toasts, setToasts] = useState<ToastItem[]>([]);
+  const [preview, setPreview] = useState<{ file: DriveFile; url: string } | null>(null);
 
   const driveBytes = files.reduce((sum, file) => sum + file.size, 0);
-  const used = otherBytes + driveBytes;
-  const remaining = Math.max(0, ACCOUNT_QUOTA_BYTES - used);
+  const remaining = Math.max(0, ACCOUNT_QUOTA_BYTES - otherBytes - driveBytes);
+  const uploading = jobs.length > 0;
+
+  function pushToast(kind: ToastItem["kind"], message: string) {
+    const id = ++toastId.current;
+    setToasts((prev) => [...prev, { id, kind, message }]);
+    window.setTimeout(() => {
+      setToasts((prev) => prev.filter((toast) => toast.id !== id));
+    }, 4200);
+  }
 
   const load = useCallback(async () => {
     const supabase = createClient();
-    const { data, error: listError } = await supabase.storage
-      .from("files")
-      .list(userId, {
-        limit: 200,
-        sortBy: { column: "created_at", order: "desc" },
-      });
+    const { data, error: listError } = await supabase.storage.from("files").list(userId, {
+      limit: 200,
+      sortBy: { column: "created_at", order: "desc" },
+    });
     if (listError) {
-      setError(listError.message);
+      pushToast("error", listError.message);
       setLoading(false);
       return;
     }
@@ -81,7 +123,6 @@ export default function StorageDrive({
         updatedAt: item.updated_at ?? item.created_at ?? null,
       }))
     );
-    setError(null);
     setLoading(false);
   }, [userId]);
 
@@ -105,53 +146,70 @@ export default function StorageDrive({
     event.target.value = "";
     if (!picked.length) return;
 
-    setUploading(true);
-    setError(null);
     const supabase = createClient();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    if (!session?.access_token) {
+      pushToast("error", "You need to sign in again to upload.");
+      return;
+    }
+
     let extra = 0;
+    let uploaded = 0;
 
     for (const file of picked) {
       if (file.size > MAX_FILE_BYTES) {
-        setError(`${file.name} is larger than 50 MB.`);
+        pushToast("error", `${file.name} is larger than 50 MB.`);
         continue;
       }
       if (otherBytes + driveBytes + extra + file.size > ACCOUNT_QUOTA_BYTES) {
-        setError("Not enough account storage left for this file.");
-        break;
+        pushToast("error", `Not enough storage left for ${file.name}.`);
+        continue;
       }
 
+      setJobs((prev) => [...prev, { name: file.name, percent: 0 }]);
       const path = `${userId}/${Date.now()}-${safeFileName(file.name)}`;
-      const { error: uploadError } = await supabase.storage.from("files").upload(path, file, {
-        cacheControl: "3600",
-        upsert: false,
-        contentType: file.type || undefined,
-      });
-      if (uploadError) {
-        setError(uploadError.message);
-        break;
+      try {
+        await uploadWithProgress(path, file, session.access_token, (percent) => {
+          setJobs((prev) =>
+            prev.map((job) => (job.name === file.name ? { ...job, percent } : job))
+          );
+        });
+        extra += file.size;
+        uploaded += 1;
+        pushToast("success", `${file.name} uploaded`);
+      } catch (err) {
+        const raw = err instanceof Error ? err.message : "Upload failed.";
+        let message = raw;
+        try {
+          const parsed = JSON.parse(raw) as { message?: string; error?: string };
+          message = parsed.message || parsed.error || raw;
+        } catch {
+          // keep raw
+        }
+        pushToast("error", `${file.name}: ${message}`);
+      } finally {
+        setJobs((prev) => prev.filter((job) => job.name !== file.name));
       }
-      extra += file.size;
     }
 
-    setUploading(false);
-    await load();
+    if (uploaded > 0) await load();
   }
 
   async function openPreview(file: DriveFile) {
     try {
-      const url = await signedUrl(file.path);
-      setPreview({ file, url });
+      setPreview({ file, url: await signedUrl(file.path) });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not open file.");
+      pushToast("error", err instanceof Error ? err.message : "Could not open file.");
     }
   }
 
   async function download(file: DriveFile) {
     try {
-      const url = await signedUrl(file.path, file.name);
-      window.open(url, "_blank", "noopener,noreferrer");
+      window.open(await signedUrl(file.path, file.name), "_blank", "noopener,noreferrer");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Download failed.");
+      pushToast("error", err instanceof Error ? err.message : "Download failed.");
     }
   }
 
@@ -159,11 +217,12 @@ export default function StorageDrive({
     const supabase = createClient();
     const { error: deleteError } = await supabase.storage.from("files").remove([file.path]);
     if (deleteError) {
-      setError(deleteError.message);
+      pushToast("error", deleteError.message);
       return;
     }
     if (preview?.file.path === file.path) setPreview(null);
     setFiles((prev) => prev.filter((item) => item.path !== file.path));
+    pushToast("success", `${file.name} deleted`);
   }
 
   return (
@@ -184,22 +243,31 @@ export default function StorageDrive({
           <Upload size={14} aria-hidden="true" />
           {uploading ? "Uploading…" : "Upload"}
         </button>
-        <input
-          ref={inputRef}
-          type="file"
-          multiple
-          className="hidden"
-          onChange={handleFiles}
-        />
+        <input ref={inputRef} type="file" multiple className="hidden" onChange={handleFiles} />
       </div>
 
-      {error && (
-        <p className="mt-4 rounded-lg bg-[#452b0c] p-3 text-[13px] text-[#fdd663]">{error}</p>
+      {jobs.length > 0 && (
+        <div className="mt-4 space-y-3 rounded-2xl border border-[#3c4043] bg-[#292a2d] p-4">
+          {jobs.map((job) => (
+            <div key={job.name}>
+              <div className="mb-1.5 flex items-center justify-between gap-3 text-[12px]">
+                <span className="min-w-0 truncate text-[#e8eaed]">{job.name}</span>
+                <span className="shrink-0 text-[#9aa0a6]">{job.percent}%</span>
+              </div>
+              <div className="h-1.5 overflow-hidden rounded-full bg-[#3c4043]">
+                <div
+                  className="h-full rounded-full bg-[#8ab4f8] transition-[width] duration-150"
+                  style={{ width: `${Math.max(job.percent, 2)}%` }}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
       )}
 
       {loading ? (
         <p className="mt-4 text-[13px] text-[#9aa0a6]">Loading files…</p>
-      ) : files.length === 0 ? (
+      ) : files.length === 0 && !uploading ? (
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
@@ -306,6 +374,11 @@ export default function StorageDrive({
           </div>
         </div>
       )}
+
+      <ToastStack
+        toasts={toasts}
+        onDismiss={(id) => setToasts((prev) => prev.filter((toast) => toast.id !== id))}
+      />
     </section>
   );
 }
