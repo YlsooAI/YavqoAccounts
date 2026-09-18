@@ -5,6 +5,21 @@ import { useRouter } from "next/navigation";
 import { TriangleAlert } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
+async function emptyFolder(
+  supabase: ReturnType<typeof createClient>,
+  bucket: string,
+  userId: string
+) {
+  const { data: files } = await supabase.storage.from(bucket).list(userId, {
+    limit: 200,
+  });
+  if (files?.length) {
+    await supabase.storage
+      .from(bucket)
+      .remove(files.map((file) => `${userId}/${file.name}`));
+  }
+}
+
 export default function DeleteAccountForm({
   email,
   userId,
@@ -28,14 +43,8 @@ export default function DeleteAccountForm({
     const supabase = createClient();
 
     try {
-      const { data: files } = await supabase.storage
-        .from("avatars")
-        .list(userId, { limit: 100 });
-      if (files?.length) {
-        await supabase.storage
-          .from("avatars")
-          .remove(files.map((file) => `${userId}/${file.name}`));
-      }
+      await emptyFolder(supabase, "avatars", userId);
+      await emptyFolder(supabase, "files", userId);
     } catch {
       // Storage cleanup is best-effort; the auth user delete still proceeds.
     }
@@ -67,6 +76,7 @@ export default function DeleteAccountForm({
         </p>
         <ul className="mt-4 list-disc space-y-1 pl-6 text-[13px] text-[#f6b53f]/90">
           <li>YavqoID, profile photo, and personal info</li>
+          <li>Uploaded files, videos, and account storage</li>
           <li>Saved passwords, contacts, and family membership</li>
           <li>Connected apps and OAuth access you granted</li>
           <li>YavqoTV friends and wallet cards stored on this account</li>
@@ -108,9 +118,7 @@ export default function DeleteAccountForm({
           />
         </label>
 
-        {error && (
-          <p className="mt-3 text-[13px] text-[#f28b82]">{error}</p>
-        )}
+        {error && <p className="mt-3 text-[13px] text-[#f28b82]">{error}</p>}
 
         <div className="mt-5 flex justify-end">
           <button
