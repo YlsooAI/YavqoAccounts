@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getAccountUser } from "@/lib/account";
+import { originFromUrl } from "@/lib/connectedApps";
 import {
   SCOPE_DESCRIPTIONS,
   generateAuthorizationCode,
@@ -93,17 +94,6 @@ async function resolveAuthRequest(
   };
 }
 
-function buildRedirect(
-  request: AuthRequest,
-  params: Record<string, string>
-): string {
-  const url = new URL(request.redirectUri);
-  for (const [key, value] of Object.entries(params)) {
-    url.searchParams.set(key, value);
-  }
-  return url.toString();
-}
-
 async function approve(formData: FormData) {
   "use server";
   await completeConsent(formData, true);
@@ -126,10 +116,10 @@ async function completeConsent(formData: FormData, approved: boolean) {
   const supabase = await createClient();
   const { data } = await supabase
     .from("id_oauth_clients")
-    .select("client_id, redirect_uris")
+    .select("client_id, name, redirect_uris")
     .eq("client_id", clientId)
     .maybeSingle();
-  const client = data as Pick<OAuthClient, "client_id" | "redirect_uris"> | null;
+  const client = data as OAuthClient | null;
   if (!client || !client.redirect_uris.includes(redirectUri)) {
     redirect("/");
   }
@@ -158,6 +148,20 @@ async function completeConsent(formData: FormData, approved: boolean) {
     code_challenge_method: codeChallenge ? codeChallengeMethod || "S256" : null,
   });
   if (error) redirect("/");
+
+  const { siteUrl, siteHost } = originFromUrl(redirectUri);
+  await supabase.from("id_oauth_authorizations").upsert(
+    {
+      user_id: user.id,
+      client_id: clientId,
+      site_title: client.name,
+      site_url: siteUrl,
+      site_host: siteHost,
+      scope,
+      last_used_at: new Date().toISOString(),
+    },
+    { onConflict: "user_id,client_id" }
+  );
 
   const url = new URL(redirectUri);
   url.searchParams.set("code", code);
