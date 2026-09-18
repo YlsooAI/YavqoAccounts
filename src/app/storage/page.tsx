@@ -3,12 +3,14 @@ import {
   ChevronRight,
   Contact,
   Fingerprint,
+  Folder,
   Image as ImageIcon,
   KeyRound,
   Network,
   Users,
 } from "lucide-react";
 import AccountShell from "@/components/AccountShell";
+import StorageDrive from "@/components/StorageDrive";
 import { getAccountUser } from "@/lib/account";
 import { createClient } from "@/lib/supabase/server";
 import {
@@ -20,7 +22,7 @@ import {
 export const dynamic = "force-dynamic";
 
 type Bucket = {
-  href: string;
+  href?: string;
   icon: LucideIcon;
   color: string;
   title: string;
@@ -39,6 +41,7 @@ export default async function StoragePage() {
     idRes,
     familyRes,
     avatarList,
+    driveList,
   ] = await Promise.all([
     supabase.from("saved_passwords").select("*").eq("user_id", user.id),
     supabase.from("contacts").select("*").eq("user_id", user.id),
@@ -50,6 +53,7 @@ export default async function StoragePage() {
       .eq("user_id", user.id)
       .eq("status", "active"),
     supabase.storage.from("avatars").list(user.id, { limit: 100 }),
+    supabase.storage.from("files").list(user.id, { limit: 200 }),
   ]);
 
   const passwords = passwordsRes.data ?? [];
@@ -58,8 +62,15 @@ export default async function StoragePage() {
   const ids = idRes.data ?? [];
   const family = familyRes.data ?? [];
   const avatarFiles = avatarList.data ?? [];
+  const driveFiles = (driveList.data ?? []).filter(
+    (item) => item.id && !item.name.endsWith("/")
+  );
 
   const photoBytes = avatarFiles.reduce(
+    (sum, file) => sum + (file.metadata?.size ?? 0),
+    0
+  );
+  const driveBytes = driveFiles.reduce(
     (sum, file) => sum + (file.metadata?.size ?? 0),
     0
   );
@@ -71,14 +82,20 @@ export default async function StoragePage() {
 
   const buckets: Bucket[] = [
     {
+      icon: Folder,
+      color: "#c58af9",
+      title: "Files",
+      items:
+        driveFiles.length === 1 ? "1 file" : `${driveFiles.length} files`,
+      bytes: driveBytes,
+    },
+    {
       href: "/personal/photo",
       icon: ImageIcon,
       color: "#81c995",
       title: "Photos & avatars",
       items:
-        avatarFiles.length === 1
-          ? "1 file"
-          : `${avatarFiles.length} files`,
+        avatarFiles.length === 1 ? "1 file" : `${avatarFiles.length} files`,
       bytes: photoBytes,
     },
     {
@@ -131,6 +148,7 @@ export default async function StoragePage() {
   ];
 
   const used = buckets.reduce((sum, bucket) => sum + bucket.bytes, 0);
+  const otherBytes = used - driveBytes;
   const percent = Math.min(100, (used / ACCOUNT_QUOTA_BYTES) * 100);
   const barWidth = used === 0 ? 0.6 : Math.max(percent, 1.2);
 
@@ -139,8 +157,8 @@ export default async function StoragePage() {
       <div className="mx-auto max-w-[660px] pb-16 pt-6 md:pt-10">
         <h2 className="text-[24px] font-normal">Account storage</h2>
         <p className="mt-2 text-[13px] text-[#9aa0a6]">
-          Photos, saved passwords, contacts, and other account data stored with
-          your Yavqo Account.
+          Store images, videos, and other files up to 50 MB each. Account data
+          also counts toward your 1 GB quota.
         </p>
 
         <section className="mt-8 rounded-2xl border border-[#3c4043] bg-[#292a2d] p-6">
@@ -160,48 +178,65 @@ export default async function StoragePage() {
           </p>
         </section>
 
+        <StorageDrive userId={user.id} otherBytes={otherBytes} />
+
         <h3 className="mt-10 text-[15px] font-medium text-[#9aa0a6]">
           Storage breakdown
         </h3>
         <div className="mt-3 overflow-hidden rounded-2xl border border-[#3c4043]">
-          {buckets.map((bucket) => (
-            <a
-              key={bucket.title}
-              href={bucket.href}
-              className="flex items-center gap-4 border-b border-[#3c4043] bg-[#292a2d] px-5 py-4 last:border-b-0 transition-colors hover:bg-white/5"
-            >
-              <span
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full"
-                style={{ backgroundColor: bucket.color }}
-              >
-                <bucket.icon
-                  size={18}
-                  className="text-[#1f1f1f]"
-                  aria-hidden="true"
-                />
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block truncate text-[14px]">{bucket.title}</span>
-                <span className="block truncate text-[12px] text-[#9aa0a6]">
-                  {bucket.items}
+          {buckets.map((bucket) => {
+            const inner = (
+              <>
+                <span
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full"
+                  style={{ backgroundColor: bucket.color }}
+                >
+                  <bucket.icon
+                    size={18}
+                    className="text-[#1f1f1f]"
+                    aria-hidden="true"
+                  />
                 </span>
-              </span>
-              <span className="shrink-0 text-[13px] text-[#9aa0a6]">
-                {formatBytes(bucket.bytes)}
-              </span>
-              <ChevronRight
-                size={16}
-                className="shrink-0 text-[#9aa0a6]"
-                aria-hidden="true"
-              />
-            </a>
-          ))}
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-[14px]">{bucket.title}</span>
+                  <span className="block truncate text-[12px] text-[#9aa0a6]">
+                    {bucket.items}
+                  </span>
+                </span>
+                <span className="shrink-0 text-[13px] text-[#9aa0a6]">
+                  {formatBytes(bucket.bytes)}
+                </span>
+                {bucket.href ? (
+                  <ChevronRight
+                    size={16}
+                    className="shrink-0 text-[#9aa0a6]"
+                    aria-hidden="true"
+                  />
+                ) : null}
+              </>
+            );
+            return bucket.href ? (
+              <a
+                key={bucket.title}
+                href={bucket.href}
+                className="flex items-center gap-4 border-b border-[#3c4043] bg-[#292a2d] px-5 py-4 last:border-b-0 transition-colors hover:bg-white/5"
+              >
+                {inner}
+              </a>
+            ) : (
+              <div
+                key={bucket.title}
+                className="flex items-center gap-4 border-b border-[#3c4043] bg-[#292a2d] px-5 py-4 last:border-b-0"
+              >
+                {inner}
+              </div>
+            );
+          })}
         </div>
 
         <p className="mt-6 text-[12px] leading-relaxed text-[#9aa0a6]">
-          Storage is calculated from files in your avatar folder and the size of
-          account records. Card details stay with Stripe and do not count toward
-          this quota.
+          Drive files are private to your account. Card details stay with Stripe
+          and do not count toward this quota.
         </p>
       </div>
     </AccountShell>
