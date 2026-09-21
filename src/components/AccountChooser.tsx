@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ChevronRight, Plus } from "lucide-react";
 import Avatar from "@/components/Avatar";
+import SwitchingAccountModal from "@/components/SwitchingAccountModal";
 import { currentSlot, rememberedAccounts, type RememberedAccount } from "@/lib/remembered-accounts";
 
 export default function AccountChooser({ nextTarget }: { nextTarget: string }) {
@@ -11,6 +12,7 @@ export default function AccountChooser({ nextTarget }: { nextTarget: string }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeSlot, setActiveSlot] = useState("");
+  const [switchingTo, setSwitchingTo] = useState<RememberedAccount | null>(null);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -24,6 +26,9 @@ export default function AccountChooser({ nextTarget }: { nextTarget: string }) {
     if (busy) return;
     setBusy(true);
     setError(null);
+    if (action === "switch") {
+      setSwitchingTo(accounts.find((account) => account.slot === slot) ?? null);
+    }
     try {
       const response = await fetch("/api/accounts", {
         method: "POST",
@@ -38,6 +43,7 @@ export default function AccountChooser({ nextTarget }: { nextTarget: string }) {
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Could not switch accounts.");
       setBusy(false);
+      setSwitchingTo(null);
     }
   }
 
@@ -70,8 +76,9 @@ export default function AccountChooser({ nextTarget }: { nextTarget: string }) {
           </button>
         </div>
         {error && <p role="alert" className="chooser-error">{error}</p>}
-        {busy && <p role="status" className="chooser-status">Switching account…</p>}
+        {busy && !switchingTo && <p role="status" className="chooser-status">Opening sign-in…</p>}
       </div>
+      {switchingTo && <SwitchingAccountModal account={switchingTo} />}
       <footer className="chooser-footer">
         <Link href="/privacy">Privacy</Link><span>·</span>
         <Link href="/terms">Terms</Link><span>·</span>
