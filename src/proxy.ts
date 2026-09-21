@@ -1,8 +1,11 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
+import { ACTIVE_SLOT_COOKIE, cookieNameForSlot, safeInternalPath, validSlot } from "@/lib/account-slots";
 
 const PUBLIC_PATHS = [
   "/login",
+  "/accounts",
+  "/api/accounts",
   "/auth/callback",
   "/oauth/token",
   "/oauth/userinfo",
@@ -24,6 +27,9 @@ export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(url, key, {
+    cookieOptions: {
+      name: cookieNameForSlot(url, validSlot(request.cookies.get(ACTIVE_SLOT_COOKIE)?.value)),
+    },
     cookies: {
       getAll() {
         return request.cookies.getAll();
@@ -68,7 +74,7 @@ export async function proxy(request: NextRequest) {
 
   if (hasSession && pathname === "/login") {
     const next = request.nextUrl.searchParams.get("next");
-    if (next?.startsWith("/") && !next.startsWith("//")) {
+    if (next && safeInternalPath(next) === next) {
       return NextResponse.redirect(new URL(next, request.url));
     }
     return NextResponse.redirect(new URL("/", request.url));

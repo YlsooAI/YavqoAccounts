@@ -6,12 +6,14 @@ import Avatar from "@/components/Avatar";
 import MobileNav from "@/components/MobileNav";
 import SignOutButton from "@/components/SignOutButton";
 import type { AccountUser } from "@/lib/account";
+import RememberCurrentAccount from "@/components/RememberCurrentAccount";
 
 export default function AccountShell({ active, user, children }: {
   active: string; user: AccountUser; children: ReactNode;
 }) {
   return (
     <div className="account-shell">
+      <RememberCurrentAccount id={user.id} name={user.displayName} email={user.email} avatarUrl={user.avatarUrl} />
       <a href="#account-content" className="account-skip">Skip to content</a>
       <header className="account-header">
         <Link href="/" className="account-brand" aria-label="Yavqo Account home">
@@ -25,7 +27,7 @@ export default function AccountShell({ active, user, children }: {
         </nav>
         <div className="account-header-end">
           <Link href="/developers/oauth" className="account-developer-link">Developers</Link>
-          <Link href="/personal" aria-label="Your profile">
+          <Link href="/accounts" aria-label="Switch account" title="Switch account">
             <Avatar avatarUrl={user.avatarUrl} initial={user.initial} className="h-8 w-8 text-sm" />
           </Link>
         </div>

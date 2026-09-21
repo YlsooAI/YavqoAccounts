@@ -3,6 +3,9 @@
 import { useState, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { currentSlot, maskEmail, rememberAccount } from "@/lib/remembered-accounts";
+import Link from "next/link";
+import { safeInternalPath } from "@/lib/account-slots";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -20,10 +23,7 @@ export default function LoginForm() {
 
   // Resume an OAuth authorize request (or other internal page) after login.
   const nextParam = searchParams.get("next");
-  const nextTarget =
-    nextParam && nextParam.startsWith("/") && !nextParam.startsWith("//")
-      ? nextParam
-      : "/";
+  const nextTarget = safeInternalPath(nextParam);
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -41,6 +41,15 @@ export default function LoginForm() {
       if (signInError) {
         setError(signInError.message);
       } else {
+        const { data } = await supabase.auth.getUser();
+        if (data.user) {
+          const address = data.user.email ?? email;
+          rememberAccount({
+            slot: currentSlot(), id: data.user.id,
+            name: address.split("@")[0] || "Yavqo user",
+            maskedEmail: maskEmail(address), avatarUrl: null,
+          });
+        }
         router.push(nextTarget);
         router.refresh();
       }
@@ -52,6 +61,13 @@ export default function LoginForm() {
       if (signUpError) {
         setError(signUpError.message);
       } else if (data.session) {
+        if (data.user) {
+          rememberAccount({
+            slot: currentSlot(), id: data.user.id,
+            name: email.split("@")[0] || "Yavqo user",
+            maskedEmail: maskEmail(email), avatarUrl: null,
+          });
+        }
         router.push(nextTarget);
         router.refresh();
       } else {
@@ -83,7 +99,7 @@ export default function LoginForm() {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-4">
+        <form onSubmit={handleSubmit} noValidate className="mt-8 flex flex-col gap-4">
           <input
             type="email"
             required
@@ -165,6 +181,9 @@ export default function LoginForm() {
             </>
           )}
         </p>
+        <Link href={`/accounts?next=${encodeURIComponent(nextTarget)}`} className="mt-5 block text-center text-[13px] text-[#8ab4f8] hover:underline">
+          Choose another account
+        </Link>
       </div>
     </main>
   );

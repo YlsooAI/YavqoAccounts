@@ -56,6 +56,11 @@ OAuth consent follows the supplied Meta login reference: a top-aligned
 account identity, plain permission list, and full-width blue pill action.
 The invalid-request state uses the same layout and a safe account-home link.
 
+Account switching uses the September 21 account chooser reference: centered
+brand, narrow 560px column, outlined identity rows with avatars and masked
+email, a pale add-account pill, and a quiet footer. It shares the account
+palette and typography.
+
 ## Elevation & Depth
 
 Use whitespace and fine borders. No shadows on navigation or overview rows.

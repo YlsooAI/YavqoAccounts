@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { TriangleAlert } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { forgetCurrentAccount } from "@/lib/remembered-accounts";
 
 async function emptyFolder(
   supabase: ReturnType<typeof createClient>,
@@ -57,6 +58,7 @@ export default function DeleteAccountForm({
     }
 
     await supabase.auth.signOut();
+    forgetCurrentAccount();
     router.push("/login?deleted=1");
     router.refresh();
   }

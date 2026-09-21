@@ -1,8 +1,8 @@
 # Account UI contract
 
-This change is visual. Existing route components and server APIs remain
-the implementation evidence for account, authentication, billing, and
-privacy operations; it introduces no new business rules.
+Account routes retain their existing data behavior. Account selection adds
+separate browser sessions for people who sign in to several Yavqo identities
+on one device.
 
 | Capability | Owner | Contract |
 | --- | --- | --- |
@@ -11,8 +11,10 @@ privacy operations; it introduces no new business rules.
 | Layout and theme | AccountShell, globals.css | Shared white account theme, natural page scrolling, narrow-screen reflow |
 | Scrollbar | globals.css | Visible global baseline with forced-colors fallback |
 | Forms and feedback | Existing editor components | Preserve field semantics, values, handlers, pending and error states |
-| Sign out | SignOutButton | Existing Supabase sign-out action and login destination |
+| Sign out | SignOutButton | Sign out only the active account slot, forget its chooser label, then show the account chooser |
+| Multiple accounts | account-slots, account API, AccountChooser | Each slot has separate Supabase auth cookies. A switch validates the target session first. Adding an account creates a new slot and opens sign-in. Remembered identity labels contain a masked email only; passwords and tokens are never stored in localStorage. |
 
-No API, authorization, payment, or destructive-action changes are part of
-the redesign. Existing native date/select controls remain platform-owned.
-Functional, browser, and automated testing is deferred to the user by request.
+An account switch verifies the selected session with Supabase before changing
+the active slot. Expired sessions show an inline error and can be added again.
+The chooser preserves an internal OAuth return path through login and switching.
+Existing native date/select controls remain platform-owned.

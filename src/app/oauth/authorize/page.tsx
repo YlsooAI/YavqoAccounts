@@ -176,7 +176,8 @@ export default async function OAuthAuthorizePage({
 }: {
   searchParams: Promise<SearchParams>;
 }) {
-  const resolved = await resolveAuthRequest(await searchParams);
+  const params = await searchParams;
+  const resolved = await resolveAuthRequest(params);
 
   if (!resolved.ok) {
     return (
@@ -202,6 +203,12 @@ export default async function OAuthAuthorizePage({
     resolved.request;
   const user = await getAccountUser();
   const targetHost = new URL(redirectUri).hostname;
+  const query = new URLSearchParams();
+  for (const [key, value] of Object.entries(params)) {
+    if (typeof value === "string") query.set(key, value);
+    else if (Array.isArray(value)) value.forEach((item) => query.append(key, item));
+  }
+  const chooserHref = `/accounts?next=${encodeURIComponent(`/oauth/authorize?${query.toString()}`)}`;
 
   return (
     <main className="account-shell oauth-page">
@@ -224,6 +231,7 @@ export default async function OAuthAuthorizePage({
               <p className="oauth-email">{user.email}</p>
             </div>
           </div>
+          <Link href={chooserHref} className="oauth-switch-account">Use another account</Link>
         </div>
 
         <section className="oauth-permissions" aria-labelledby="oauth-permissions-title">
@@ -244,7 +252,7 @@ export default async function OAuthAuthorizePage({
         </p>
 
         <div className="oauth-actions">
-          <form action={approve} className="oauth-approve-form">
+          <form action={approve} noValidate className="oauth-approve-form">
             <HiddenRequestFields
               clientId={client.client_id}
               redirectUri={redirectUri}
@@ -260,7 +268,7 @@ export default async function OAuthAuthorizePage({
               Authorize
             </button>
           </form>
-          <form action={deny} id="oauth-deny" className="oauth-cancel-form">
+          <form action={deny} noValidate id="oauth-deny" className="oauth-cancel-form">
             <HiddenRequestFields
               clientId={client.client_id}
               redirectUri={redirectUri}

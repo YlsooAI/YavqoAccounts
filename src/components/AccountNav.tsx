@@ -2,6 +2,7 @@ import Link from "next/link";
 
 const items = [
   { key: "overview", label: "Account overview", href: "/" },
+  { key: "accounts", label: "Switch account", href: "/accounts" },
   { key: "personal", label: "Personal information", href: "/personal" },
   { key: "personal-contact", label: "Contact information", href: "/personal/contact" },
   { key: "personal-photo", label: "Profile photo", href: "/personal/photo" },
