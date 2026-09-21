@@ -1,4 +1,6 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
+import { ChevronLeft, Check, UserRound } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getAccountUser } from "@/lib/account";
 import { originFromUrl } from "@/lib/connectedApps";
@@ -178,16 +180,19 @@ export default async function OAuthAuthorizePage({
 
   if (!resolved.ok) {
     return (
-      <main className="flex min-h-screen items-center justify-center px-6">
-        <div className="w-full max-w-[420px] rounded-2xl bg-[#292a2d] p-8 text-center">
-          <img src="/img/logo.png" alt="Yavqo" className="mx-auto h-16 w-16 rounded-2xl" />
-          <h1 className="mt-4 text-[20px] font-normal">
-            Sign in with Yavqo Account
+      <main className="account-shell oauth-page">
+        <div className="oauth-column">
+          <Link href="/" className="oauth-back" aria-label="Back to your account">
+            <ChevronLeft size={24} aria-hidden="true" />
+          </Link>
+          <h1 className="oauth-heading">
+            Unable to authorize this app
           </h1>
-          <p className="mt-3 text-[14px] text-[#f28b82]">{resolved.error}</p>
-          <p className="mt-2 text-[13px] text-[#9aa0a6]">
+          <p className="oauth-error" role="alert">{resolved.error}</p>
+          <p className="oauth-description">
             If you followed a link here, contact the app that sent you.
           </p>
+          <Link href="/" className="oauth-primary oauth-return">Back to your account</Link>
         </div>
       </main>
     );
@@ -199,39 +204,47 @@ export default async function OAuthAuthorizePage({
   const targetHost = new URL(redirectUri).hostname;
 
   return (
-    <main className="flex min-h-screen items-center justify-center px-6">
-      <div className="w-full max-w-[420px] rounded-2xl bg-[#292a2d] p-8">
-        <div className="flex flex-col items-center text-center">
-          <img src="/img/logo.png" alt="Yavqo" className="h-16 w-16 rounded-2xl" />
-          <h1 className="mt-4 text-[20px] font-normal">
-            {client.name} wants to access your Yavqo Account
+    <main className="account-shell oauth-page">
+      <div className="oauth-column">
+        <button type="submit" form="oauth-deny" className="oauth-back" aria-label="Cancel authorization and go back">
+          <ChevronLeft size={24} aria-hidden="true" />
+        </button>
+        <div>
+          <h1 className="oauth-heading">
+            Authorize {client.name}?
           </h1>
-          <p className="mt-1 text-[13px] text-[#9aa0a6]">{user.email}</p>
+          <p className="oauth-description">
+            Connect your Yavqo Account to {client.name}. Review the information
+            you&apos;ll share before continuing.
+          </p>
+          <div className="oauth-identity">
+            <UserRound size={22} aria-hidden="true" />
+            <div className="min-w-0">
+              <span className="oauth-label">Signed in with Yavqo</span>
+              <p className="oauth-email">{user.email}</p>
+            </div>
+          </div>
         </div>
 
-        <div className="mt-6 rounded-xl border border-[#3c4043] bg-[#202124] p-4">
-          <p className="text-[13px] font-medium text-[#e8eaed]">
-            This will allow {client.name} ({targetHost}) to:
-          </p>
-          <ul className="mt-3 space-y-2">
+        <section className="oauth-permissions" aria-labelledby="oauth-permissions-title">
+          <h2 id="oauth-permissions-title">This app will be able to:</h2>
+          <ul>
             {scopes.map((scope) => (
-              <li key={scope} className="flex gap-2 text-[13px] text-[#bdc1c6]">
-                <span className="text-[#81c995]" aria-hidden="true">
-                  •
-                </span>
+              <li key={scope}>
+                <Check size={18} aria-hidden="true" />
                 {SCOPE_DESCRIPTIONS[scope]}
               </li>
             ))}
           </ul>
-        </div>
+        </section>
 
-        <p className="mt-4 text-center text-[12px] leading-relaxed text-[#9aa0a6]">
+        <p className="oauth-notice">
           Only continue if you trust {targetHost}. You can always revoke
-          access later.
+          access later in <Link href="/apps">Connected apps</Link>.
         </p>
 
-        <div className="mt-6 flex justify-end gap-3">
-          <form action={deny}>
+        <div className="oauth-actions">
+          <form action={approve} className="oauth-approve-form">
             <HiddenRequestFields
               clientId={client.client_id}
               redirectUri={redirectUri}
@@ -242,12 +255,12 @@ export default async function OAuthAuthorizePage({
             />
             <button
               type="submit"
-              className="h-10 rounded-full border border-[#5f6368] px-5 text-[13px] transition-colors hover:bg-white/5"
+              className="oauth-primary"
             >
-              Cancel
+              Authorize
             </button>
           </form>
-          <form action={approve}>
+          <form action={deny} id="oauth-deny" className="oauth-cancel-form">
             <HiddenRequestFields
               clientId={client.client_id}
               redirectUri={redirectUri}
@@ -258,9 +271,9 @@ export default async function OAuthAuthorizePage({
             />
             <button
               type="submit"
-              className="h-10 rounded-full bg-[#8ab4f8] px-5 text-[13px] font-medium text-[#202124] transition-opacity hover:opacity-90"
+              className="oauth-secondary"
             >
-              Continue
+              Cancel
             </button>
           </form>
         </div>

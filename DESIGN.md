@@ -36,7 +36,8 @@ desktop and mobile. No new market-specific behavior is implied.
 Runtime ownership lives in the account-scoped variables in
 src/app/globals.css. This document mirrors those values. Existing dark
 utility classes are adapted inside .account-shell so shared forms receive
-the same light palette. Login and standalone consent pages keep their theme.
+the same light palette. Login keeps its existing theme; standalone OAuth
+consent shares the account palette without navigation chrome.
 Blue identifies actions; green, amber, and red remain semantic feedback.
 
 ## Typography
@@ -49,6 +50,11 @@ text and forms. Technical values keep their existing monospace treatment.
 72px header, sidebar up to 425px, 680px content measure. Document scrolling
 owns long pages. Below 768px a native details disclosure replaces the sidebar.
 The overview uses a profile header and divided settings rows.
+
+OAuth consent follows the supplied Meta login reference: a top-aligned
+560px column, 24px outer gutters, back control, 25px heading, outlined
+account identity, plain permission list, and full-width blue pill action.
+The invalid-request state uses the same layout and a safe account-home link.
 
 ## Elevation & Depth
 
