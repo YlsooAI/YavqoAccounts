@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import type { AuthMFAListFactorsResponse } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
 
 type Phase = "idle" | "enrolled" | "verifying" | "busy";
@@ -29,7 +30,7 @@ export default function TwoStepVerificationCard() {
     const supabase = createClient();
     supabase.auth.mfa
       .listFactors()
-      .then(({ data }) => {
+      .then(({ data }: AuthMFAListFactorsResponse) => {
         setEnabled(Boolean(data?.totp && data.totp.length > 0));
       })
       .finally(() => setPhase("idle"));

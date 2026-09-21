@@ -84,13 +84,17 @@ export default function FamilyManager({
 
     let resolvedInvitations: Invitation[] = [];
     if (inviteRows && inviteRows.length > 0) {
-      const familyIds = [...new Set(inviteRows.map((row) => row.family_id))];
+      const familyIds = [
+        ...new Set((inviteRows as Member[]).map((row) => row.family_id)),
+      ];
       const { data: familiesForInvites } = await supabase
         .from("families")
         .select("id, name")
         .in("id", familyIds);
       const names = new Map(
-        (familiesForInvites ?? []).map((f) => [f.id, f.name as string])
+        ((familiesForInvites ?? []) as Pick<Family, "id" | "name">[]).map(
+          (f) => [f.id, f.name] as const
+        )
       );
       resolvedInvitations = (inviteRows as Member[]).map((row) => ({
         ...row,

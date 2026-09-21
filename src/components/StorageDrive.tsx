@@ -34,6 +34,14 @@ type UploadJob = {
   percent: number;
 };
 
+type ListedFile = {
+  id: string;
+  name: string;
+  metadata?: { size?: number; mimetype?: string } | null;
+  updated_at?: string | null;
+  created_at?: string | null;
+};
+
 function kindOf(mime: string, name: string): "image" | "video" | "other" {
   if (mime.startsWith("image/") || /\.(png|jpe?g|gif|webp|avif|svg|bmp|heic)$/i.test(name)) {
     return "image";
@@ -119,7 +127,9 @@ export default function StorageDrive({
       setLoading(false);
       return;
     }
-    const listed = (data ?? []).filter((item) => item.id && !item.name.endsWith("/"));
+    const listed = ((data ?? []) as ListedFile[]).filter(
+      (item) => item.id && !item.name.endsWith("/")
+    );
     setFiles(
       listed.map((item) => ({
         path: `${userId}/${item.name}`,

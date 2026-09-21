@@ -17,7 +17,7 @@ async function emptyFolder(
   if (files?.length) {
     await supabase.storage
       .from(bucket)
-      .remove(files.map((file) => `${userId}/${file.name}`));
+      .remove(files.map((file: { name: string }) => `${userId}/${file.name}`));
   }
 }
 

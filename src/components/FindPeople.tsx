@@ -13,6 +13,11 @@ type SearchResult = {
   avatar_url: string | null;
 };
 
+type FriendRow = {
+  user_id: string;
+  friend_id: string;
+};
+
 export default function FindPeople() {
   const [meId, setMeId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
@@ -37,7 +42,7 @@ export default function FindPeople() {
         .or(`user_id.eq.${id},friend_id.eq.${id}`);
       setFriendIds(
         new Set(
-          (rows ?? []).map((r) =>
+          ((rows ?? []) as FriendRow[]).map((r) =>
             r.user_id === id ? r.friend_id : r.user_id
           )
         )
