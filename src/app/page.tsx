@@ -79,15 +79,19 @@ export default async function AccountPage() {
   return (
     <AccountShell active="overview" user={user}>
       <div className="mx-auto max-w-[660px] pb-16 pt-6 md:pt-10">
-        <div className="flex flex-col items-center text-center">
+        <div className="account-overview-profile">
+          <div className="account-overview-avatar">
           <Avatar
             avatarUrl={user.avatarUrl}
             initial={user.initial}
             className="h-24 w-24 text-[40px] font-normal"
           />
           <AvatarUploadButton userId={user.id} />
+          </div>
+          <div>
           <h2 className="mt-4 text-[24px] font-normal">{user.displayName}</h2>
           <p className="mt-1 text-[13px] text-[#9aa0a6]">{user.email}</p>
+          </div>
         </div>
 
         {!user.emailConfirmed && (
@@ -146,7 +150,7 @@ export default async function AccountPage() {
         <h3 className="mt-10 text-left text-[15px] font-medium text-[#9aa0a6]">
           Your account
         </h3>
-        <div className="mt-3 grid gap-4 sm:grid-cols-2">
+        <div className="account-overview-grid mt-3">
           <OverviewCard
             href="/security"
             icon={Lock}
