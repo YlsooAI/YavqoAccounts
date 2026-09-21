@@ -17,6 +17,9 @@
   line-height: 1.5;
 }
 .account-header { height: 72px; display: flex; align-items: center; gap: 48px; padding: 0 32px; }
+.account-sidebar-toggle { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; margin-left: -8px; border-radius: 999px; color: var(--account-ink); transition: background-color 150ms; }
+.account-sidebar-toggle:hover { background: var(--account-soft); }
+.account-shell.sidebar-collapsed .account-sidebar { display: none; }
 .account-brand { display: flex; align-items: center; gap: 7px; font-size: 21px; font-weight: 600; letter-spacing: -.6px; }
 .account-brand img { border-radius: 8px; }
 .account-header-links { display: flex; gap: 36px; font-size: 14px; }
@@ -105,6 +108,7 @@
 }
 @media (max-width: 767px) {
   .account-header { height: 64px; padding: 0 20px; }
+  .account-sidebar-toggle { display: none; }
   .account-header-links, .account-developer-link, .account-sidebar { display: none; }
   .account-mobile-nav { display: block; border-block: 1px solid var(--account-line); }
   .account-mobile-nav summary { display: flex; align-items: center; gap: 12px; padding: 16px 24px; font-size: 15px; list-style: none; }

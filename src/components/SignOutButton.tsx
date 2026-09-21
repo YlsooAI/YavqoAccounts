@@ -20,7 +20,7 @@ export default function SignOutButton() {
     <button
       type="button"
       onClick={handleSignOut}
-      className="flex items-center gap-1.5 rounded-full p-2 text-[13px] text-[#9aa0a6] transition-colors hover:bg-white/10 hover:text-white"
+      className="flex items-center gap-1.5 rounded-full p-2 pl-0 text-[13px] text-[#9aa0a6] transition-colors hover:text-white"
     >
       <LogOut size={16} aria-hidden="true" />
       <span>Sign out</span>

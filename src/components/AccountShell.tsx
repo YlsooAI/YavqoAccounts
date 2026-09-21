@@ -1,6 +1,8 @@
-import type { ReactNode } from "react";
+"use client";
+
+import { useState, type ReactNode } from "react";
 import Link from "next/link";
-import { CircleUserRound } from "lucide-react";
+import { CircleUserRound, Menu, X } from "lucide-react";
 import AccountNav from "@/components/AccountNav";
 import Avatar from "@/components/Avatar";
 import MobileNav from "@/components/MobileNav";
@@ -11,11 +13,22 @@ import RememberCurrentAccount from "@/components/RememberCurrentAccount";
 export default function AccountShell({ active, user, children }: {
   active: string; user: AccountUser; children: ReactNode;
 }) {
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   return (
-    <div className="account-shell">
+    <div className={`account-shell${sidebarOpen ? "" : " sidebar-collapsed"}`}>
       <RememberCurrentAccount id={user.id} name={user.displayName} email={user.email} avatarUrl={user.avatarUrl} />
       <a href="#account-content" className="account-skip">Skip to content</a>
       <header className="account-header">
+        <button
+          type="button"
+          onClick={() => setSidebarOpen((open) => !open)}
+          aria-expanded={sidebarOpen}
+          aria-controls="account-sidebar"
+          aria-label={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
+          className="account-sidebar-toggle"
+        >
+          {sidebarOpen ? <X size={20} aria-hidden="true" /> : <Menu size={20} aria-hidden="true" />}
+        </button>
         <Link href="/" className="account-brand" aria-label="Yavqo Account home">
           <img src="/img/logo.png" alt="" width={28} height={28} />
           <span>Yavqo</span>
@@ -34,7 +47,7 @@ export default function AccountShell({ active, user, children }: {
       </header>
       <MobileNav active={active} />
       <div className="account-layout">
-        <aside className="account-sidebar">
+        <aside id="account-sidebar" className="account-sidebar">
           <AccountNav active={active} />
           <div className="account-sidebar-footer">
             <Link href="/security" className="account-centre-link">
