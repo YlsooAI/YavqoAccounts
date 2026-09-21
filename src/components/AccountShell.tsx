@@ -45,7 +45,13 @@ export default function AccountShell({ active, user, children }: {
           </Link>
         </div>
       </header>
-      <MobileNav active={active} />
+      <MobileNav
+        active={active}
+        name={user.displayName}
+        email={user.email}
+        avatarUrl={user.avatarUrl}
+        initial={user.initial}
+      />
       <div className="account-layout">
         <aside id="account-sidebar" className="account-sidebar">
           <AccountNav active={active} />
@@ -54,7 +60,14 @@ export default function AccountShell({ active, user, children }: {
               <CircleUserRound size={20} aria-hidden="true" /> Account centre
             </Link>
             <p>Password, security, personal details, and preferences. All in one place.</p>
-            <div className="account-signout"><SignOutButton /></div>
+            <div className="account-signout">
+              <SignOutButton
+                name={user.displayName}
+                email={user.email}
+                avatarUrl={user.avatarUrl}
+                initial={user.initial}
+              />
+            </div>
             <div className="account-legal"><Link href="/privacy">Privacy</Link><Link href="/terms">Terms</Link></div>
           </div>
         </aside>

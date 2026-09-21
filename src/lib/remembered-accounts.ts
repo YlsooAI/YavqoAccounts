@@ -56,3 +56,11 @@ export function forgetCurrentAccount() {
     // Signing out must not depend on local storage being available.
   }
 }
+
+export function forgetAllAccounts() {
+  try {
+    localStorage.removeItem(REMEMBERED_ACCOUNTS_KEY);
+  } catch {
+    // Signing out must not depend on local storage being available.
+  }
+}

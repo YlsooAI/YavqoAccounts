@@ -2,13 +2,25 @@ import { Menu } from "lucide-react";
 import AccountNav from "@/components/AccountNav";
 import SignOutButton from "@/components/SignOutButton";
 
-export default function MobileNav({ active }: { active: string }) {
+export default function MobileNav({
+  active,
+  name,
+  email,
+  avatarUrl,
+  initial,
+}: {
+  active: string;
+  name: string;
+  email: string;
+  avatarUrl: string | null;
+  initial: string;
+}) {
   return (
     <details className="account-mobile-nav">
       <summary><Menu size={20} aria-hidden="true" /> Account settings</summary>
       <div className="account-mobile-panel">
         <AccountNav active={active} />
-        <SignOutButton />
+        <SignOutButton name={name} email={email} avatarUrl={avatarUrl} initial={initial} />
       </div>
     </details>
   );

@@ -161,6 +161,23 @@
 .switching-account-label > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .switching-account-email { color: var(--account-muted); font-size: 13px; }
 
+/* Sign-out confirmation: same dimmed overlay and card as account switching. */
+.signout-overlay { position: fixed; inset: 0; z-index: 90; display: flex; align-items: center; justify-content: center; padding: 24px; background: rgb(23 33 38 / 55%); animation: fade-in 160ms ease-out both; }
+.signout-modal { width: min(420px, 100%); border-radius: 16px; background: var(--account-surface); box-shadow: 0 16px 48px rgb(23 33 38 / 24%); padding: 28px 24px 22px; text-align: left; animation: pop-in 180ms ease-out both; outline: none; }
+.signout-modal h2 { margin: 0; font-size: 20px; line-height: 1.3; font-weight: 600; letter-spacing: -.3px; }
+.signout-modal > p { margin-top: 8px; color: var(--account-muted); font-size: 15px; line-height: 1.45; }
+.signout-modal .switching-account { margin-top: 18px; }
+.signout-error { margin-top: 14px; color: #b42318; font-size: 14px; }
+.signout-actions { display: grid; gap: 10px; margin-top: 22px; }
+.signout-modal .signout-actions button { display: flex; align-items: center; justify-content: center; width: 100%; min-height: 46px; border-radius: 999px; padding: 12px 20px; font-size: 15px; font-weight: 500; }
+.signout-modal .signout-primary { background: var(--account-blue); color: white; }
+.signout-modal .signout-primary:hover { background: #0056c2; }
+.signout-modal .signout-secondary { border: 1px solid var(--account-line); color: var(--account-ink); background: var(--account-surface); }
+.signout-modal .signout-secondary:hover { background: var(--account-soft); }
+.signout-modal .signout-cancel { color: var(--account-ink); background: var(--account-soft); }
+.signout-modal .signout-cancel:hover { background: #e5eaf0; }
+.signout-modal .signout-actions button:disabled { opacity: .65; }
+
 @media (max-width: 600px) {
   .chooser-page { padding: 42px 20px 24px; }
   .chooser-column h1 { margin-top: 40px; }
@@ -194,6 +211,11 @@
 .oauth-secondary:hover { background: var(--account-soft); }
 .oauth-return { margin-top: 28px; }
 .oauth-error { margin-top: 20px; color: #b42318; font-size: 15px; }
+.oauth-primary, .oauth-secondary { gap: 10px; }
+.oauth-primary:disabled, .oauth-secondary:disabled { opacity: .7; }
+.oauth-spinner { width: 18px; height: 18px; flex-shrink: 0; border: 2px solid transparent; border-radius: 999px; animation: spin 800ms linear infinite; }
+.oauth-spinner-light { border-color: rgb(255 255 255 / 40%); border-top-color: #fff; }
+.oauth-spinner-dark { border-color: #ccd4db; border-top-color: var(--account-blue); }
 @media (max-width: 600px) {
   .oauth-page { padding-top: 16px; }
   .oauth-heading { font-size: 24px; }

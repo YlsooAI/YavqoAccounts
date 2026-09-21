@@ -10,6 +10,7 @@ import {
   parseScopes,
   type OAuthScope,
 } from "@/lib/oauth";
+import { AuthorizeButton, CancelButton } from "@/components/OAuthConsentButtons";
 
 export const dynamic = "force-dynamic";
 
@@ -261,12 +262,7 @@ export default async function OAuthAuthorizePage({
               codeChallenge={codeChallenge}
               codeChallengeMethod={codeChallengeMethod}
             />
-            <button
-              type="submit"
-              className="oauth-primary"
-            >
-              Authorize
-            </button>
+            <AuthorizeButton />
           </form>
           <form action={deny} noValidate id="oauth-deny" className="oauth-cancel-form">
             <HiddenRequestFields
@@ -277,12 +273,7 @@ export default async function OAuthAuthorizePage({
               codeChallenge={codeChallenge}
               codeChallengeMethod={codeChallengeMethod}
             />
-            <button
-              type="submit"
-              className="oauth-secondary"
-            >
-              Cancel
-            </button>
+            <CancelButton />
           </form>
         </div>
       </div>
