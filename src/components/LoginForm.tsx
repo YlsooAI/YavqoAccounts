@@ -81,110 +81,29 @@ export default function LoginForm() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center px-6">
-      <div className="w-full max-w-[400px] rounded-2xl bg-[#292a2d] p-8">
-        <div className="flex flex-col items-center text-center">
-          <img
-            src="/img/logo.png"
-            alt="Yavqo"
-            className="h-20 w-20 rounded-3xl"
-          />
-          <h1 className="mt-4 text-[22px] font-normal">
-            {mode === "signin"
-              ? "Sign in to your Yavqo Account"
-              : "Create your Yavqo Account"}
-          </h1>
-          <p className="mt-1 text-[13px] text-[#9aa0a6]">
-            One account for everything Yavqo.
-          </p>
-        </div>
-
-        <form onSubmit={handleSubmit} noValidate className="mt-8 flex flex-col gap-4">
-          <input
-            type="email"
-            required
-            autoComplete="email"
-            placeholder="Email address"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            className="h-11 rounded-lg border border-[#3c4043] bg-[#202124] px-4 text-[14px] outline-none placeholder:text-[#9aa0a6] focus:border-[#8ab4f8]"
-          />
-          <input
-            type="password"
-            required
-            minLength={6}
-            autoComplete={
-              mode === "signin" ? "current-password" : "new-password"
-            }
-            placeholder="Password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            className="h-11 rounded-lg border border-[#3c4043] bg-[#202124] px-4 text-[14px] outline-none placeholder:text-[#9aa0a6] focus:border-[#8ab4f8]"
-          />
-
-          {error && <p className="text-[13px] text-[#f28b82]">{error}</p>}
-          {notice && <p className="text-[13px] text-[#81c995]">{notice}</p>}
-          {accountDeleted && !error && !notice && (
-            <p className="text-[13px] text-[#81c995]">
-              Your Yavqo Account has been deleted.
-            </p>
-          )}
-          {confirmationFailed && !error && (
-            <p className="text-[13px] text-[#f28b82]">
-              Email confirmation failed or expired. Try signing in again.
-            </p>
-          )}
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="h-11 rounded-full bg-[#8ab4f8] text-[14px] font-medium text-[#202124] transition-opacity hover:opacity-90 disabled:opacity-60"
-          >
-            {loading
-              ? "Please wait…"
-              : mode === "signin"
-                ? "Sign In"
-                : "Create Account"}
-          </button>
+    <main className="public-page">
+      <header className="public-header"><Link href="/" className="public-brand" aria-label="Yavqo Accounts home">Yavqo <span>Accounts</span></Link></header>
+      <section className="public-login" aria-labelledby="login-title">
+        <p className="public-overline">Yavqo Accounts</p>
+        <h1 id="login-title">{mode === "signin" ? "Log in to your account" : "Create your account"}</h1>
+        <p className="public-description">One account for everything Yavqo.</p>
+        <form onSubmit={handleSubmit} noValidate className="public-form">
+          <div className="public-field"><label htmlFor="login-email">Email address</label><input id="login-email" type="email" required autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="Enter your email address" aria-invalid={!!error} /></div>
+          <div className="public-field"><label htmlFor="login-password">Password</label><input id="login-password" type="password" required minLength={6} autoComplete={mode === "signin" ? "current-password" : "new-password"} value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Enter your password" aria-invalid={!!error} /></div>
+          {error && <p className="public-message public-error" role="alert">{error}</p>}
+          {notice && <p className="public-message public-success" role="status">{notice}</p>}
+          {accountDeleted && !error && !notice && <p className="public-message public-success" role="status">Your Yavqo Account has been deleted.</p>}
+          {confirmationFailed && !error && <p className="public-message public-error" role="alert">Email confirmation failed or expired. Try signing in again.</p>}
+          <button type="submit" disabled={loading} className="public-primary">{loading ? "Please wait…" : mode === "signin" ? "Log in" : "Create account"}</button>
         </form>
-
-        <p className="mt-6 text-center text-[13px] text-[#9aa0a6]">
-          {mode === "signin" ? (
-            <>
-              No account yet?{" "}
-              <button
-                type="button"
-                onClick={() => {
-                  setMode("signup");
-                  setError(null);
-                  setNotice(null);
-                }}
-                className="font-medium text-[#8ab4f8] hover:underline"
-              >
-                Create your Yavqo Account
-              </button>
-            </>
-          ) : (
-            <>
-              Already have an account?{" "}
-              <button
-                type="button"
-                onClick={() => {
-                  setMode("signin");
-                  setError(null);
-                  setNotice(null);
-                }}
-                className="font-medium text-[#8ab4f8] hover:underline"
-              >
-                Sign in
-              </button>
-            </>
-          )}
-        </p>
-        <Link href={`/accounts?next=${encodeURIComponent(nextTarget)}`} className="mt-5 block text-center text-[13px] text-[#8ab4f8] hover:underline">
-          Choose another account
-        </Link>
-      </div>
+        <div className="public-login-secondary">
+          <button type="button" onClick={() => { setMode(mode === "signin" ? "signup" : "signin"); setError(null); setNotice(null); }}>
+            {mode === "signin" ? "Create a new account" : "Already have an account? Log in"}
+          </button>
+          <Link href={`/accounts?next=${encodeURIComponent(nextTarget)}`}>Choose another account</Link>
+        </div>
+      </section>
+      <footer className="public-footer"><span>Yavqo Accounts</span><nav aria-label="Legal"><Link href="/privacy">Privacy</Link><Link href="/terms">Terms</Link></nav></footer>
     </main>
   );
 }

@@ -1,28 +1,16 @@
 import Link from "next/link";
-import StatusScreen from "@/components/StatusScreen";
 
 export default function NotFound() {
   return (
-    <StatusScreen
-      code="404"
-      title="This page couldn’t be found"
-      body="The address may be mistyped, or the page may have been moved or deleted."
-      actions={
-        <>
-          <Link
-            href="/"
-            className="flex h-10 items-center rounded-full bg-[#8ab4f8] px-5 text-[13px] font-medium text-[#202124] transition-opacity hover:opacity-90"
-          >
-            Go to your account
-          </Link>
-          <Link
-            href="/privacy"
-            className="flex h-10 items-center rounded-full border border-[#5f6368] px-5 text-[13px] transition-colors hover:bg-white/5"
-          >
-            Help &amp; privacy
-          </Link>
-        </>
-      }
-    />
+    <main className="public-page">
+      <header className="public-header"><Link href="/" className="public-brand" aria-label="Yavqo Accounts home">Yavqo <span>Accounts</span></Link></header>
+      <section className="public-not-found" aria-labelledby="missing-title">
+        <p className="public-overline">404 · Page not found</p>
+        <h1 id="missing-title">This page isn’t available</h1>
+        <p>The link may be broken, or the page may have moved. You can return to your account and continue from there.</p>
+        <Link href="/" className="public-primary public-return">Go to your account</Link>
+      </section>
+      <footer className="public-footer"><span>Yavqo Accounts</span><nav aria-label="Legal"><Link href="/privacy">Privacy</Link><Link href="/terms">Terms</Link></nav></footer>
+    </main>
   );
 }

@@ -36,7 +36,7 @@ desktop and mobile. No new market-specific behavior is implied.
 Runtime ownership lives in the account-scoped variables in
 src/app/globals.css. This document mirrors those values. Existing dark
 utility classes are adapted inside .account-shell so shared forms receive
-the same light palette. Login keeps its existing theme; standalone OAuth
+the same light palette. Login and 404 use this same light palette as public account pages; standalone OAuth
 consent shares the account palette without navigation chrome.
 Blue identifies actions; green, amber, and red remain semantic feedback.
 
