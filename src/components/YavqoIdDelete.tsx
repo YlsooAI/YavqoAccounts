@@ -1,71 +1,49 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Trash2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
-export default function YavqoIdDelete({ userId }: { userId: string }) {
+export default function YavqoIdDelete({ userId, handle }: { userId: string; handle: string }) {
   const router = useRouter();
-  const [confirming, setConfirming] = useState(false);
+  const dialogRef = useRef<HTMLDialogElement>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  function openDialog() {
+    setError(null);
+    dialogRef.current?.showModal();
+  }
+
   async function remove() {
+    if (busy) return;
     setBusy(true);
     setError(null);
     const supabase = createClient();
-    const { error: deleteError } = await supabase
-      .from("id_accounts")
-      .delete()
-      .eq("user_id", userId);
-    setBusy(false);
+    const { error: deleteError } = await supabase.from("id_accounts").delete().eq("user_id", userId);
     if (deleteError) {
       setError(deleteError.message);
+      setBusy(false);
       return;
     }
+    dialogRef.current?.close();
     router.refresh();
   }
 
   return (
-    <div className="mt-6 rounded-2xl border border-[#f28b82]/30 bg-[#292a2d] p-6">
-      <h3 className="text-[15px] text-[#f28b82]">Retire your YavqoID</h3>
-      <p className="mt-2 text-[13px] leading-relaxed text-[#9aa0a6]">
-        Deleting your YavqoID frees your handle so anyone can claim it.
-        Friends added through it stay in your YavqoTV friends list.
-      </p>
-      {error && (
-        <p className="mt-3 rounded-lg bg-[#452b0c] px-4 py-3 text-[13px] text-[#fdd663]">
-          {error}
-        </p>
-      )}
-      <div className="mt-4 flex items-center justify-end gap-2">
-        {confirming && (
-          <button
-            type="button"
-            onClick={() => setConfirming(false)}
-            disabled={busy}
-            className="h-9 rounded-full px-4 text-[13px] text-[#9aa0a6] transition-colors hover:bg-white/5 disabled:opacity-60"
-          >
-            Cancel
-          </button>
-        )}
-        <button
-          type="button"
-          disabled={busy}
-          onClick={() => {
-            if (!confirming) {
-              setConfirming(true);
-              return;
-            }
-            void remove();
-          }}
-          className="flex h-9 items-center gap-2 rounded-full bg-[#f28b82]/10 px-4 text-[13px] font-medium text-[#f28b82] transition-colors hover:bg-[#f28b82]/20 disabled:opacity-50"
-        >
-          <Trash2 size={15} aria-hidden="true" />
-          {busy ? "Deleting…" : confirming ? "Confirm delete" : "Delete YavqoID"}
-        </button>
-      </div>
-    </div>
+    <section className="yid-danger" aria-labelledby="yid-delete-title">
+      <h2 id="yid-delete-title">Retire your YavqoID</h2>
+      <p>Your handle will become available to someone else. Your Yavqo Account and existing Yavqo TV friends will remain.</p>
+      <button type="button" onClick={openDialog} className="yid-danger-trigger">Delete YavqoID</button>
+      <dialog ref={dialogRef} className="yid-delete-dialog" aria-labelledby="yid-confirm-title" onCancel={(event) => { if (busy) event.preventDefault(); }}>
+        <h2 id="yid-confirm-title">Delete @{handle}?</h2>
+        <p>This removes your YavqoID profile and releases @{handle}. Someone else may then claim it. This won’t delete your Yavqo Account or your existing friends.</p>
+        {error && <p role="alert" className="public-message public-error">{error}</p>}
+        <div className="yid-delete-actions">
+          <button type="button" className="yid-delete-cancel" disabled={busy} onClick={() => dialogRef.current?.close()}>Cancel</button>
+          <button type="button" className="yid-delete-confirm" disabled={busy} onClick={remove}>{busy ? "Deleting…" : "Delete YavqoID"}</button>
+        </div>
+      </dialog>
+    </section>
   );
 }

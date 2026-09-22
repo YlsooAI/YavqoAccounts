@@ -18,3 +18,8 @@ An account switch verifies the selected session with Supabase before changing
 the active slot. Expired sessions show an inline error and can be added again.
 The chooser preserves an internal OAuth return path through login and switching.
 Existing native date/select controls remain platform-owned.
+
+YavqoID home groups existing profile, people, app, and security destinations.
+The profile editor remains the owner of handle, name, bio, and photo changes.
+Deleting a YavqoID requires a modal confirmation naming the handle and leaves
+the Yavqo Account and existing TV friends intact.

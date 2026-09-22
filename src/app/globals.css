@@ -341,3 +341,61 @@ body {
 .public-page :is(a, button, input):focus-visible { outline: 2px solid #0064e0; outline-offset: 4px; }
 @media (max-width: 540px) { .public-header { min-height: 64px; } .public-login, .public-not-found { padding: 48px 0 72px; } .public-footer { flex-wrap: wrap; } }
 @media (prefers-reduced-motion: reduce) { .public-primary { transition: none; } }
+
+/* YavqoID account hub */
+.yid-page { max-width: 680px; margin-inline: auto; padding-bottom: 80px; }
+.yid-heading { margin-bottom: 28px; }
+.yid-eyebrow { color: var(--account-blue); font-size: 13px; font-weight: 600; }
+.account-content .yid-heading h1 { margin-top: 5px; font-size: 34px; font-weight: 600; line-height: 1.2; letter-spacing: -.8px; }
+.yid-heading > div > p:last-child { margin-top: 9px; color: var(--account-muted); font-size: 15px; }
+.yid-profile { padding: 26px; border: 1px solid var(--account-line); border-radius: 20px; background: #fff; }
+.yid-profile-main { display: flex; align-items: center; gap: 20px; }
+.yid-profile-text { min-width: 0; }
+.yid-profile-label { color: var(--account-muted); font-size: 13px; }
+.account-content .yid-profile h2 { margin-top: 2px; overflow-wrap: anywhere; font-size: 25px; }
+.yid-handle { display: flex; align-items: center; gap: 3px; color: var(--account-blue); font-size: 15px; }
+.yid-handle button { color: var(--account-blue); }
+.yid-bio { margin-top: 20px; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 15px; }
+.yid-member { margin-top: 12px; color: var(--account-muted); font-size: 13px; }
+.yid-profile-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+.yid-button { display: inline-flex; min-height: 44px; align-items: center; justify-content: center; gap: 9px; border-radius: 999px; padding: 9px 20px; font-size: 14px; font-weight: 600; }
+.yid-button-primary { background: var(--account-blue); color: #fff; }
+.yid-button-primary:hover { background: #0056c2; }
+.yid-button-secondary { border: 1px solid #b7c1ca; color: var(--account-ink); }
+.yid-button-secondary:hover { background: var(--account-soft); }
+.yid-section { margin-top: 38px; }
+.yid-section-heading { margin-bottom: 12px; }
+.account-content .yid-section-heading h2 { font-size: 21px; font-weight: 600; letter-spacing: -.3px; }
+.yid-section-heading p { margin-top: 4px; color: var(--account-muted); font-size: 14px; }
+.yid-list { overflow: hidden; border: 1px solid var(--account-line); border-radius: 16px; }
+.yid-row { display: flex; min-height: 76px; align-items: center; gap: 16px; padding: 14px 20px; }
+.yid-row + .yid-row { border-top: 1px solid var(--account-line); }
+.yid-row:hover { background: var(--account-soft); }
+.yid-row-icon { display: flex; width: 42px; height: 42px; flex: none; align-items: center; justify-content: center; border-radius: 50%; background: var(--account-soft); color: var(--account-blue); }
+.yid-row-copy { display: grid; min-width: 0; flex: 1; gap: 2px; }
+.yid-row-copy strong { font-size: 15px; font-weight: 600; }
+.yid-row-copy > span { overflow-wrap: anywhere; color: var(--account-muted); font-size: 13px; }
+.yid-row > svg { flex: none; color: var(--account-muted); }
+.yid-danger { margin-top: 44px; border-top: 1px solid var(--account-line); padding-top: 24px; }
+.account-content .yid-danger h2 { font-size: 17px; font-weight: 600; }
+.yid-danger > p { margin-top: 7px; color: var(--account-muted); font-size: 14px; }
+.yid-danger-trigger { margin-top: 17px; border: 1px solid #d7a8a4; border-radius: 999px; padding: 10px 18px; color: #a1251b; font-size: 14px; font-weight: 600; }
+.yid-danger-trigger:hover { background: #fff1f0; }
+.yid-delete-dialog { width: min(100% - 32px, 440px); max-height: calc(100dvh - 32px); margin: auto; border: 0; border-radius: 20px; padding: 28px; background: #fff; color: #172126; box-shadow: 0 20px 70px #0003; }
+.yid-delete-dialog::backdrop { background: #15202bb0; }
+.yid-delete-dialog h2 { font-size: 23px; font-weight: 600; }
+.yid-delete-dialog p { margin-top: 12px; color: #607080; font-size: 14px; line-height: 1.5; }
+.yid-delete-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 28px; }
+.yid-delete-actions button { min-height: 42px; border-radius: 999px; padding: 9px 18px; font-size: 14px; font-weight: 600; }
+.yid-delete-cancel { background: #f1f4f7; }
+.yid-delete-confirm { background: #b42318; color: #fff; }
+.yid-delete-confirm:disabled { opacity: .6; }
+@media (max-width: 560px) { .yid-profile { padding: 20px; } .yid-profile-main { gap: 14px; } .yid-profile-actions .yid-button { flex: 1; } .yid-row { padding-inline: 14px; } }
+
+.yid-flow > h2 { font-size: 28px; font-weight: 600; letter-spacing: -.5px; }
+.yid-flow > div.rounded-2xl, .yid-flow > .mt-6.rounded-2xl { border-color: var(--account-line); background: #fff; }
+.yid-flow input, .yid-flow textarea { color: var(--account-ink); }
+.yid-flow [class*="border-[#5f6368]"] { border-color: #bcc5ce; }
+.yid-flow [class*="bg-[#202124]"] { background: #fff; }
+.yid-flow [class*="text-[#e8eaed]"] { color: var(--account-ink); }
+.yid-delete-dialog .public-error { margin-top: 16px; background: #fff0ef; color: #a1251b; }

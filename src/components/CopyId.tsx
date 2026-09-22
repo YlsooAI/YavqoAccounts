@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Check, Copy } from "lucide-react";
 
-export default function CopyId({ value }: { value: string }) {
+export default function CopyId({ value, label = "Copy ID" }: { value: string; label?: string }) {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -24,7 +24,7 @@ export default function CopyId({ value }: { value: string }) {
   return (
     <button
       type="button"
-      aria-label="Copy ID"
+      aria-label={copied ? "Copied" : label}
       onClick={copy}
       className="rounded-full p-1.5 text-[#9aa0a6] transition-colors hover:bg-white/10 hover:text-white"
     >

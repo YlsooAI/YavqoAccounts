@@ -85,3 +85,11 @@ Global scrollbar styling supplies visible thumb and interaction states.
 - Preserve real destinations, user data, and existing save behavior.
 - Avoid colorful navigation badges, decorative gradients in chrome, and fake controls.
 - Leave functional and browser testing to the user per their request.
+
+## YavqoID
+
+The YavqoID home is an identity hub within the account shell: a compact profile
+summary, grouped full-row destinations, and a quiet destructive section at the
+bottom. It uses the account blue for active actions and the shared white canvas,
+lines, and pill buttons. Setup and edit use the same palette. Destructive
+confirmation uses a focused dialog with clear consequences.

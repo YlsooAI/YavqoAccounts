@@ -122,7 +122,7 @@ export default function YavqoIdEditor({
   }
 
   return (
-    <div className="mx-auto max-w-[560px] pb-16 pt-6 md:pt-10">
+    <div className="yid-flow mx-auto max-w-[560px] pb-16 pt-6 md:pt-10">
       <h2 className="text-[24px] font-normal">Edit your YavqoID</h2>
       <p className="mt-2 text-[13px] text-[#9aa0a6]">
         Changes are visible to other Yavqo users right away.
@@ -152,14 +152,14 @@ export default function YavqoIdEditor({
             }}
             className={`flex h-10 items-center gap-3 rounded-full border px-5 text-[13px] transition-colors disabled:opacity-50 ${
               pictureChoice === "account"
-                ? "border-[#8b5cf6] bg-[#8b5cf6]/10"
+                ? "border-[#0064e0] bg-[#0064e0]/10"
                 : "border-[#5f6368] hover:bg-white/5"
             }`}
           >
-            <UserRound size={15} className="text-[#8b5cf6]" aria-hidden="true" />
+            <UserRound size={15} className="text-[#0064e0]" aria-hidden="true" />
             Use my Yavqo Account photo
             {pictureChoice === "account" && (
-              <Check size={14} className="ml-auto text-[#8b5cf6]" aria-hidden="true" />
+              <Check size={14} className="ml-auto text-[#0064e0]" aria-hidden="true" />
             )}
           </button>
           <button
@@ -168,14 +168,14 @@ export default function YavqoIdEditor({
             onClick={() => fileRef.current?.click()}
             className={`flex h-10 items-center gap-3 rounded-full border px-5 text-[13px] transition-colors disabled:opacity-50 ${
               pictureChoice === "upload"
-                ? "border-[#8b5cf6] bg-[#8b5cf6]/10"
+                ? "border-[#0064e0] bg-[#0064e0]/10"
                 : "border-[#5f6368] hover:bg-white/5"
             }`}
           >
-            <ImagePlus size={15} className="text-[#8b5cf6]" aria-hidden="true" />
+            <ImagePlus size={15} className="text-[#0064e0]" aria-hidden="true" />
             {uploading ? "Uploading…" : "Upload a different photo"}
             {pictureChoice === "upload" && (
-              <Check size={14} className="ml-auto text-[#8b5cf6]" aria-hidden="true" />
+              <Check size={14} className="ml-auto text-[#0064e0]" aria-hidden="true" />
             )}
           </button>
           <input
@@ -193,21 +193,21 @@ export default function YavqoIdEditor({
             }}
             className={`flex h-10 items-center gap-3 rounded-full border px-5 text-[13px] transition-colors ${
               pictureChoice === "none"
-                ? "border-[#8b5cf6] bg-[#8b5cf6]/10"
+                ? "border-[#0064e0] bg-[#0064e0]/10"
                 : "border-[#5f6368] hover:bg-white/5"
             }`}
           >
             No photo
             {pictureChoice === "none" && (
-              <Check size={14} className="ml-auto text-[#8b5cf6]" aria-hidden="true" />
+              <Check size={14} className="ml-auto text-[#0064e0]" aria-hidden="true" />
             )}
           </button>
         </div>
 
         <label className="mt-6 block text-left text-[12px] text-[#9aa0a6]">
           Handle
-          <div className="mt-1 flex h-11 items-center rounded-full border border-[#5f6368] bg-[#202124] px-5 focus-within:border-[#8b5cf6]">
-            <span className="mr-1 text-[14px] text-[#8b5cf6]">@</span>
+          <div className="mt-1 flex h-11 items-center rounded-full border border-[#5f6368] bg-[#202124] px-5 focus-within:border-[#0064e0]">
+            <span className="mr-1 text-[14px] text-[#0064e0]">@</span>
             <input
               value={handle}
               onChange={(e) => onHandleChange(e.target.value)}
@@ -230,7 +230,7 @@ export default function YavqoIdEditor({
               setDisplayName(e.target.value);
               setSaved(false);
             }}
-            className="mt-1 h-11 w-full rounded-full border border-[#5f6368] bg-[#202124] px-5 text-[14px] text-[#e8eaed] outline-none focus:border-[#8b5cf6]"
+            className="mt-1 h-11 w-full rounded-full border border-[#5f6368] bg-[#202124] px-5 text-[14px] text-[#e8eaed] outline-none focus:border-[#0064e0]"
           />
         </label>
 
@@ -243,7 +243,7 @@ export default function YavqoIdEditor({
               setSaved(false);
             }}
             rows={3}
-            className="mt-1 w-full resize-none rounded-2xl border border-[#5f6368] bg-[#202124] p-4 text-[14px] text-[#e8eaed] outline-none focus:border-[#8b5cf6]"
+            className="mt-1 w-full resize-none rounded-2xl border border-[#5f6368] bg-[#202124] p-4 text-[14px] text-[#e8eaed] outline-none focus:border-[#0064e0]"
           />
           <span className="mt-1 block text-right text-[11px] text-[#5f6368]">
             {bio.length}/160
@@ -266,7 +266,7 @@ export default function YavqoIdEditor({
             type="button"
             onClick={save}
             disabled={saving}
-            className="h-10 rounded-full bg-[#8b5cf6] px-6 text-[13px] font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+            className="h-10 rounded-full bg-[#0064e0] px-6 text-[13px] font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
           >
             {saving ? "Saving…" : "Save changes"}
           </button>

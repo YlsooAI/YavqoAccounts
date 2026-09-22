@@ -47,7 +47,7 @@ export default function YavqoIdSetup({ user }: { user: AccountUser }) {
   useEffect(() => {
     const stored = localStorage.getItem("yavqoid-sounds");
     const isMuted = stored === "off";
-    setMuted(isMuted);
+    queueMicrotask(() => setMuted(isMuted));
     setSoundsMuted(isMuted);
   }, []);
 
@@ -162,7 +162,7 @@ export default function YavqoIdSetup({ user }: { user: AccountUser }) {
   }
 
   return (
-    <div className="mx-auto max-w-[560px] pb-16 pt-6 md:pt-10">
+    <div className="yid-flow mx-auto max-w-[560px] pb-16 pt-6 md:pt-10">
       <div className="flex items-center gap-3">
         {step > 0 ? (
           <button
@@ -177,8 +177,8 @@ export default function YavqoIdSetup({ user }: { user: AccountUser }) {
             <ArrowLeft size={18} aria-hidden="true" />
           </button>
         ) : (
-          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#8b5cf6]">
-            <Fingerprint size={18} className="text-[#1f1f1f]" aria-hidden="true" />
+          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#0064e0]">
+            <Fingerprint size={18} className="text-white" aria-hidden="true" />
           </span>
         )}
         <div className="flex-1">
@@ -192,7 +192,7 @@ export default function YavqoIdSetup({ user }: { user: AccountUser }) {
             <span
               key={label}
               className={`h-1.5 rounded-full transition-all duration-300 ${
-                i <= step ? "w-8 bg-[#8b5cf6]" : "w-4 bg-[#3c4043]"
+                i <= step ? "w-8 bg-[#0064e0]" : "w-4 bg-[#3c4043]"
               }`}
             />
           ))}
@@ -219,8 +219,8 @@ export default function YavqoIdSetup({ user }: { user: AccountUser }) {
               Your handle is your YavqoID — a unique identifier across all
               Yavqo products. It can only exist once, so make it yours.
             </p>
-            <div className="mt-5 flex h-12 items-center rounded-full border border-[#5f6368] bg-[#202124] px-5 focus-within:border-[#8b5cf6]">
-              <span className="mr-1 text-[15px] text-[#8b5cf6]">@</span>
+            <div className="mt-5 flex h-12 items-center rounded-full border border-[#5f6368] bg-[#202124] px-5 focus-within:border-[#0064e0]">
+              <span className="mr-1 text-[15px] text-[#0064e0]">@</span>
               <input
                 value={handle}
                 onChange={(e) => onHandleChange(e.target.value)}
@@ -244,7 +244,7 @@ export default function YavqoIdSetup({ user }: { user: AccountUser }) {
                 type="button"
                 onClick={continueFromHandle}
                 disabled={checking || handle.length === 0}
-                className="flex h-10 items-center gap-2 rounded-full bg-[#8b5cf6] px-6 text-[13px] font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+                className="flex h-10 items-center gap-2 rounded-full bg-[#0064e0] px-6 text-[13px] font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
               >
                 {checking ? "Checking…" : "Continue"}
                 {!checking && <ArrowRight size={15} aria-hidden="true" />}
@@ -285,14 +285,14 @@ export default function YavqoIdSetup({ user }: { user: AccountUser }) {
                 }}
                 className={`flex h-11 items-center gap-3 rounded-full border px-5 text-[13px] transition-colors disabled:opacity-50 ${
                   pictureChoice === "account"
-                    ? "border-[#8b5cf6] bg-[#8b5cf6]/10"
+                    ? "border-[#0064e0] bg-[#0064e0]/10"
                     : "border-[#5f6368] hover:bg-white/5"
                 }`}
               >
-                <UserRound size={16} className="text-[#8b5cf6]" aria-hidden="true" />
+                <UserRound size={16} className="text-[#0064e0]" aria-hidden="true" />
                 Use my Yavqo Account photo
                 {pictureChoice === "account" && (
-                  <Check size={15} className="ml-auto text-[#8b5cf6]" aria-hidden="true" />
+                  <Check size={15} className="ml-auto text-[#0064e0]" aria-hidden="true" />
                 )}
               </button>
               {!user.avatarUrl && (
@@ -309,14 +309,14 @@ export default function YavqoIdSetup({ user }: { user: AccountUser }) {
                 }}
                 className={`flex h-11 items-center gap-3 rounded-full border px-5 text-[13px] transition-colors disabled:opacity-50 ${
                   pictureChoice === "upload"
-                    ? "border-[#8b5cf6] bg-[#8b5cf6]/10"
+                    ? "border-[#0064e0] bg-[#0064e0]/10"
                     : "border-[#5f6368] hover:bg-white/5"
                 }`}
               >
-                <ImagePlus size={16} className="text-[#8b5cf6]" aria-hidden="true" />
+                <ImagePlus size={16} className="text-[#0064e0]" aria-hidden="true" />
                 {uploading ? "Uploading…" : "Upload a different photo"}
                 {pictureChoice === "upload" && (
-                  <Check size={15} className="ml-auto text-[#8b5cf6]" aria-hidden="true" />
+                  <Check size={15} className="ml-auto text-[#0064e0]" aria-hidden="true" />
                 )}
               </button>
               <input
@@ -335,13 +335,13 @@ export default function YavqoIdSetup({ user }: { user: AccountUser }) {
                 }}
                 className={`flex h-11 items-center gap-3 rounded-full border px-5 text-[13px] transition-colors ${
                   pictureChoice === "none"
-                    ? "border-[#8b5cf6] bg-[#8b5cf6]/10"
+                    ? "border-[#0064e0] bg-[#0064e0]/10"
                     : "border-[#5f6368] hover:bg-white/5"
                 }`}
               >
                 No photo for now
                 {pictureChoice === "none" && (
-                  <Check size={15} className="ml-auto text-[#8b5cf6]" aria-hidden="true" />
+                  <Check size={15} className="ml-auto text-[#0064e0]" aria-hidden="true" />
                 )}
               </button>
               {uploadError && (
@@ -355,7 +355,7 @@ export default function YavqoIdSetup({ user }: { user: AccountUser }) {
                   sounds.next();
                   setStep(2);
                 }}
-                className="flex h-10 items-center gap-2 rounded-full bg-[#8b5cf6] px-6 text-[13px] font-medium text-white transition-opacity hover:opacity-90"
+                className="flex h-10 items-center gap-2 rounded-full bg-[#0064e0] px-6 text-[13px] font-medium text-white transition-opacity hover:opacity-90"
               >
                 Continue
                 <ArrowRight size={15} aria-hidden="true" />
@@ -375,7 +375,7 @@ export default function YavqoIdSetup({ user }: { user: AccountUser }) {
               <input
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
-                className="mt-1 h-11 w-full rounded-full border border-[#5f6368] bg-[#202124] px-5 text-[14px] text-[#e8eaed] outline-none focus:border-[#8b5cf6]"
+                className="mt-1 h-11 w-full rounded-full border border-[#5f6368] bg-[#202124] px-5 text-[14px] text-[#e8eaed] outline-none focus:border-[#0064e0]"
               />
             </label>
             <label className="mt-4 block text-left text-[12px] text-[#9aa0a6]">
@@ -385,7 +385,7 @@ export default function YavqoIdSetup({ user }: { user: AccountUser }) {
                 onChange={(e) => setBio(e.target.value.slice(0, 160))}
                 rows={3}
                 placeholder="A line about you, visible to other Yavqo users."
-                className="mt-1 w-full resize-none rounded-2xl border border-[#5f6368] bg-[#202124] p-4 text-[14px] text-[#e8eaed] outline-none placeholder:text-[#9aa0a6] focus:border-[#8b5cf6]"
+                className="mt-1 w-full resize-none rounded-2xl border border-[#5f6368] bg-[#202124] p-4 text-[14px] text-[#e8eaed] outline-none placeholder:text-[#9aa0a6] focus:border-[#0064e0]"
               />
               <span className="mt-1 block text-right text-[11px] text-[#5f6368]">
                 {bio.length}/160
@@ -398,13 +398,13 @@ export default function YavqoIdSetup({ user }: { user: AccountUser }) {
             )}
             <div className="mt-4 flex items-center justify-between gap-3">
               <p className="text-left text-[12px] text-[#9aa0a6]">
-                Your YavqoID: <span className="text-[#8b5cf6]">@{handle}</span>
+                Your YavqoID: <span className="text-[#0064e0]">@{handle}</span>
               </p>
               <button
                 type="button"
                 onClick={createYavqoId}
                 disabled={creating}
-                className="flex h-10 shrink-0 items-center gap-2 rounded-full bg-[#8b5cf6] px-6 text-[13px] font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+                className="flex h-10 shrink-0 items-center gap-2 rounded-full bg-[#0064e0] px-6 text-[13px] font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
               >
                 {creating ? "Creating…" : "Create YavqoID"}
               </button>
