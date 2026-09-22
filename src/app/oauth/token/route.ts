@@ -96,8 +96,8 @@ export async function POST(request: Request) {
     return oauthError("invalid_grant", "Code is invalid, used, or expired.", 400);
   }
 
-  const result = data as (OAuthClaims & { granted_scope?: string }) | null;
-  if (!result?.sub) {
+  const result = data as (OAuthClaims & { granted_scope?: string; authorization_id?: string }) | null;
+  if (!result?.sub || !result.authorization_id) {
     return oauthError("invalid_grant", "Code is invalid, used, or expired.", 400);
   }
 
@@ -110,6 +110,7 @@ export async function POST(request: Request) {
     name: result.name,
     full_name: result.full_name ?? null,
     picture: result.picture,
+    avatar_url: result.avatar_url ?? null,
     handle: result.handle,
     id_display_name: result.id_display_name,
     username: result.username ?? null,
@@ -117,7 +118,7 @@ export async function POST(request: Request) {
     birthday: result.birthday ?? null,
     phone: result.phone ?? null,
   };
-  const accessToken = signAccessToken(claims, issuer, clientId, scopes);
+  const accessToken = signAccessToken(claims, issuer, clientId, scopes, result.authorization_id);
 
   return Response.json(
     {

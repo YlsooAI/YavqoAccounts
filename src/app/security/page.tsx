@@ -3,6 +3,7 @@ import AccountShell from "@/components/AccountShell";
 import ChangePasswordCard from "@/components/ChangePasswordCard";
 import ResendVerificationButton from "@/components/ResendVerificationButton";
 import TwoStepVerificationCard from "@/components/TwoStepVerificationCard";
+import SecurityActivityCard from "@/components/SecurityActivityCard";
 import { getAccountUser } from "@/lib/account";
 
 export const dynamic = "force-dynamic";
@@ -78,6 +79,8 @@ export default async function SecurityPage() {
             </span>
           </div>
         </section>
+
+        <SecurityActivityCard />
 
         <div className="h-10" />
       </div>

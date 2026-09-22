@@ -1,4 +1,5 @@
 import { verifyAccessToken } from "@/lib/oauth";
+import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
@@ -22,6 +23,22 @@ export async function GET(request: Request) {
     );
   }
 
+  // A signed JWT alone is insufficient: removing the connected app must
+  // invalidate already-issued tokens on the very next request.
+  const supabase = await createClient();
+  const { data: active, error } = await supabase.rpc("oauth_authorization_active", {
+    p_authorization_id: payload.authorization_id,
+    p_user_id: payload.sub,
+    p_client_id: payload.aud,
+    p_scope: payload.scope,
+  });
+  if (error || active !== true) {
+    return Response.json({ error: "invalid_token" }, {
+      status: 401,
+      headers: { "Cache-Control": "no-store" },
+    });
+  }
+
   const scopes = new Set(payload.scope.split(/\s+/).filter(Boolean));
   const info: Record<string, unknown> = { sub: payload.sub };
 
@@ -32,6 +49,9 @@ export async function GET(request: Request) {
   if (scopes.has("profile")) {
     info.name = payload.name;
     info.picture = payload.picture;
+  }
+  if (scopes.has("profile") || scopes.has("avatar")) {
+    info.avatar_url = payload.avatar_url;
   }
   if (scopes.has("yavqoid")) {
     info.yavqoid_handle = payload.handle;

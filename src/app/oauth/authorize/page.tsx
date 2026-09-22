@@ -185,7 +185,7 @@ async function completeConsent(formData: FormData, approved: boolean) {
   if (error || typeof code !== "string") redirect("/");
 
   const { siteUrl, siteHost } = originFromUrl(redirectUri);
-  await supabase.from("id_oauth_authorizations").upsert(
+  const { error: authorizationError } = await supabase.from("id_oauth_authorizations").upsert(
     {
       user_id: user.id,
       client_id: clientId,
@@ -197,6 +197,7 @@ async function completeConsent(formData: FormData, approved: boolean) {
     },
     { onConflict: "user_id,client_id" }
   );
+  if (authorizationError) redirect("/");
 
   const url = new URL(redirectUri);
   url.searchParams.set("code", code);

@@ -14,6 +14,7 @@ export type OAuthClaims = {
   name: string | null;
   full_name: string | null;
   picture: string | null;
+  avatar_url: string | null;
   handle: string | null;
   id_display_name: string | null;
   username: string | null;
@@ -23,6 +24,7 @@ export type OAuthClaims = {
 };
 
 export type OAuthTokenPayload = OAuthClaims & {
+  authorization_id: string;
   iss: string;
   aud: string; // client_id the token was issued for
   scope: string;
@@ -81,17 +83,20 @@ export function signAccessToken(
   claims: OAuthClaims,
   issuer: string,
   clientId: string,
-  scopes: OAuthScope[]
+  scopes: OAuthScope[],
+  authorizationId: string
 ): string {
   const now = Math.floor(Date.now() / 1000);
   const granted = new Set(scopes);
   const payload: OAuthTokenPayload = {
     sub: claims.sub,
+    authorization_id: authorizationId,
     email: granted.has("email") ? claims.email : null,
     email_verified: granted.has("email") ? claims.email_verified : false,
     name: granted.has("profile") ? claims.name : null,
     full_name: granted.has("full_name") ? claims.full_name : null,
     picture: granted.has("profile") || granted.has("avatar") ? claims.picture : null,
+    avatar_url: granted.has("profile") || granted.has("avatar") ? claims.avatar_url : null,
     handle: granted.has("yavqoid") ? claims.handle : null,
     id_display_name: granted.has("yavqoid") ? claims.id_display_name : null,
     username: granted.has("username") ? claims.username : null,
@@ -134,6 +139,10 @@ export function verifyAccessToken(token: string): OAuthTokenPayload | null {
       base64UrlDecode(body).toString("utf8")
     ) as OAuthTokenPayload;
     if (typeof payload.sub !== "string") return null;
+    if (typeof payload.authorization_id !== "string" ||
+        !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(payload.authorization_id)) {
+      return null;
+    }
     if (typeof payload.exp !== "number" || payload.exp < Date.now() / 1000) {
       return null;
     }

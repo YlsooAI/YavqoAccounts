@@ -42,7 +42,8 @@ export default function ConnectedAppsManager({ userId }: { userId: string }) {
   }, [userId]);
 
   useEffect(() => {
-    load();
+    const timer = window.setTimeout(() => { void load(); }, 0);
+    return () => window.clearTimeout(timer);
   }, [load]);
 
   async function revoke(app: Authorization) {
@@ -68,8 +69,8 @@ export default function ConnectedAppsManager({ userId }: { userId: string }) {
     <div className="mx-auto max-w-[660px] pb-16 pt-6 md:pt-10">
       <h2 className="text-[24px] font-normal">Connected apps</h2>
       <p className="mt-2 text-[13px] text-[#9aa0a6]">
-        Websites and apps that can access your Yavqo Account. You can revoke
-        access at any time.
+        Websites and apps that can access your Yavqo Account. Revoking an app
+        blocks its access token on the next profile request.
       </p>
 
       {error && (
@@ -99,6 +100,9 @@ export default function ConnectedAppsManager({ userId }: { userId: string }) {
               className="rounded-2xl border border-[#3c4043] bg-[#292a2d] p-5"
             >
               <div className="flex items-start gap-3">
+                {/* Third-party favicons are untrusted remote URLs; keep the small
+                    unoptimized icon instead of routing it through our image proxy. */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={faviconUrl(app.site_host)}
                   alt=""

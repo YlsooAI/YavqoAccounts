@@ -341,6 +341,10 @@ export default function OAuthDeveloperConsole({ userId }: { userId: string }) {
           </li>
         </ol>
         <p className="mt-3 text-[12px] text-[#9aa0a6]">
+          The profile or avatar scope includes <code>avatar_url</code> from the user&apos;s profile
+          in the userinfo response. The standard <code>picture</code> claim remains available too.
+        </p>
+        <p className="mt-3 text-[12px] text-[#9aa0a6]">
           Example with your selected scopes:{" "}
           <code className="break-all text-[12px] text-[#bdc1c6]">
             {origin}/oauth/authorize?client_id=YOUR_CLIENT_ID&redirect_uri=YOUR_URI&response_type=code&scope={encodeURIComponent(exampleScopes.join(" "))}&state=RANDOM

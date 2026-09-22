@@ -657,6 +657,7 @@ begin
                        nullif(trim(i.display_name), '')),
       'full_name', p.full_name,
       'picture', coalesce(i.avatar_url, p.avatar_url),
+      'avatar_url', p.avatar_url,
       'handle', i.handle,
       'id_display_name', i.display_name,
       'username', p.username,

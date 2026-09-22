@@ -3,11 +3,11 @@ export type OAuthScope = (typeof OAUTH_SCOPES)[number];
 
 export const SCOPE_DESCRIPTIONS: Record<OAuthScope, string> = {
   openid: "Verify your identity",
-  profile: "See your name and profile picture",
+  profile: "See your name and profile picture (including avatar_url)",
   email: "See your email address",
   yavqoid: "See your YavqoID handle",
   full_name: "See your full name",
-  avatar: "See your profile picture",
+  avatar: "See your profile picture (including avatar_url)",
   username: "See your username",
   gender: "See your gender",
   birthday: "See your birthday",
