@@ -199,6 +199,17 @@
 .oauth-permissions ul { margin-top: 12px; display: grid; gap: 12px; }
 .oauth-permissions li { display: flex; align-items: flex-start; gap: 12px; font-size: 15px; }
 .oauth-permissions li svg { flex-shrink: 0; margin-top: 3px; color: var(--account-muted); }
+.oauth-passkey-card { padding: 20px; border: 1px solid var(--account-line); border-radius: 16px; background: var(--account-soft); }
+.oauth-passkey-card h2 { font-size: 16px; font-weight: 600; }
+.oauth-passkey-card > p:not(.oauth-error) { margin: 8px 0 18px; color: var(--account-muted); font-size: 14px; line-height: 1.45; }
+.oauth-passkey-card .oauth-error { margin: 0 0 16px; }
+.oauth-passkey-options { display: grid; gap: 10px; }
+.oauth-totp-input { width: 100%; min-height: 46px; border: 1px solid var(--account-line); border-radius: 12px; padding: 10px 14px; background: white; color: var(--account-ink); font-size: 16px; letter-spacing: .2em; }
+.oauth-totp-input:focus { outline: 2px solid var(--account-blue); outline-offset: 2px; }
+.oauth-passkey-link { justify-self: center; color: var(--account-blue); font-size: 14px; }
+.oauth-passkey-link:hover { text-decoration: underline; }
+.oauth-passkey-success { margin-bottom: 14px; color: #137333; font-size: 14px; }
+.oauth-passkey-success .oauth-passkey-link { display: block; margin-top: 8px; }
 .oauth-notice { color: var(--account-muted); font-size: 13px; line-height: 1.5; }
 .oauth-notice a { color: var(--account-blue); text-decoration: underline; text-underline-offset: 2px; }
 .oauth-actions { display: flex; flex-direction: column; gap: 12px; margin-top: 26px; }

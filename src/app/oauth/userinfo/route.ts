@@ -37,6 +37,12 @@ export async function GET(request: Request) {
     info.yavqoid_handle = payload.handle;
     info.yavqoid_name = payload.id_display_name;
   }
+  if (scopes.has("full_name")) info.full_name = payload.full_name;
+  if (scopes.has("avatar") && !scopes.has("profile")) info.picture = payload.picture;
+  if (scopes.has("username")) info.username = payload.username;
+  if (scopes.has("gender")) info.gender = payload.gender;
+  if (scopes.has("birthday")) info.birthday = payload.birthday;
+  if (scopes.has("phone")) info.phone = payload.phone;
 
   return Response.json(info, {
     headers: { "Cache-Control": "no-store" },

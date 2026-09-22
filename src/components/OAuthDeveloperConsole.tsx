@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { Copy, Link2, Plus, Trash2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { OAUTH_SCOPES, SCOPE_DESCRIPTIONS, type OAuthScope } from "@/lib/oauth-scopes";
 
 type OAuthClient = {
   id: string;
@@ -29,6 +30,7 @@ export default function OAuthDeveloperConsole({ userId }: { userId: string }) {
   const [created, setCreated] = useState<CreatedCredentials | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [exampleScopes, setExampleScopes] = useState<OAuthScope[]>(["openid", "email", "full_name"]);
 
   const load = useCallback(async () => {
     const supabase = createClient();
@@ -272,6 +274,26 @@ export default function OAuthDeveloperConsole({ userId }: { userId: string }) {
 
       <div className="mt-10 rounded-xl border border-[#3c4043] bg-[#292a2d] p-5">
         <h3 className="text-[15px] font-medium">Integration guide</h3>
+        <p className="mt-2 text-[13px] text-[#bdc1c6]">
+          Choose the account data your app needs. Put these scopes in the authorization URL;
+          the person signing in will review every requested permission.
+        </p>
+        <div className="mt-4 grid gap-2 sm:grid-cols-2">
+          {OAUTH_SCOPES.map((scope) => (
+            <label key={scope} className="flex cursor-pointer items-start gap-2 rounded-lg border border-[#3c4043] p-3 text-[12px]">
+              <input
+                type="checkbox"
+                checked={exampleScopes.includes(scope)}
+                disabled={scope === "openid"}
+                onChange={(event) => setExampleScopes((current) => event.target.checked
+                  ? [...current, scope]
+                  : current.filter((item) => item !== scope))}
+                className="mt-0.5 accent-[#8ab4f8]"
+              />
+              <span><strong className="block text-[#e8eaed]">{scope}</strong>{SCOPE_DESCRIPTIONS[scope]}</span>
+            </label>
+          ))}
+        </div>
         <ol className="mt-3 list-inside list-decimal space-y-2 text-[13px] text-[#bdc1c6]">
           <li>
             Send the user to{" "}
@@ -319,10 +341,9 @@ export default function OAuthDeveloperConsole({ userId }: { userId: string }) {
           </li>
         </ol>
         <p className="mt-3 text-[12px] text-[#9aa0a6]">
-          Scopes: <code className="text-[#bdc1c6]">openid profile email yavqoid</code>.
-          Example:{" "}
+          Example with your selected scopes:{" "}
           <code className="break-all text-[12px] text-[#bdc1c6]">
-            {origin}/oauth/authorize?client_id=YOUR_CLIENT_ID&redirect_uri=YOUR_URI&response_type=code&scope=openid%20profile%20email&state=RANDOM
+            {origin}/oauth/authorize?client_id=YOUR_CLIENT_ID&redirect_uri=YOUR_URI&response_type=code&scope={encodeURIComponent(exampleScopes.join(" "))}&state=RANDOM
           </code>
         </p>
       </div>

@@ -108,9 +108,14 @@ export async function POST(request: Request) {
     email: result.email,
     email_verified: result.email_verified,
     name: result.name,
+    full_name: result.full_name ?? null,
     picture: result.picture,
     handle: result.handle,
     id_display_name: result.id_display_name,
+    username: result.username ?? null,
+    gender: result.gender ?? null,
+    birthday: result.birthday ?? null,
+    phone: result.phone ?? null,
   };
   const accessToken = signAccessToken(claims, issuer, clientId, scopes);
 

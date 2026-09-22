@@ -13,6 +13,7 @@ export function createClient() {
   if (cached) return cached;
   const client = createBrowserClient(url, key, {
     isSingleton: false,
+    auth: { experimental: { passkey: true } },
     cookieOptions: { name: cookieNameForSlot(url, slot) },
   });
   clients.set(slot, client);

@@ -9,6 +9,7 @@ export async function createClient() {
   const slot = validSlot(cookieStore.get(ACTIVE_SLOT_COOKIE)?.value);
 
   return createServerClient(url, key, {
+    auth: { experimental: { passkey: true } },
     cookieOptions: { name: cookieNameForSlot(url, slot) },
     cookies: {
       getAll() {

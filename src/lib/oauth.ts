@@ -1,17 +1,7 @@
 import { createHash, createHmac, timingSafeEqual } from "crypto";
-
-// Scopes supported by "Sign in with Yavqo Account".
-export const OAUTH_SCOPES = ["openid", "profile", "email", "yavqoid"] as const;
-export type OAuthScope = (typeof OAUTH_SCOPES)[number];
-
-export const SCOPE_DESCRIPTIONS: Record<OAuthScope, string> = {
-  openid: "Verify your identity",
-  profile: "See your name and profile picture",
-  email: "See your email address",
-  yavqoid: "See your YavqoID handle",
-};
-
-export const DEFAULT_SCOPES: OAuthScope[] = ["openid", "profile", "email"];
+import { OAUTH_SCOPES, type OAuthScope } from "@/lib/oauth-scopes";
+export { SCOPE_DESCRIPTIONS, DEFAULT_SCOPES } from "@/lib/oauth-scopes";
+export type { OAuthScope } from "@/lib/oauth-scopes";
 
 export const CODE_LIFETIME_SECONDS = 10 * 60; // authorization codes: 10 min
 export const TOKEN_LIFETIME_SECONDS = 60 * 60; // access tokens: 1 hour
@@ -22,9 +12,14 @@ export type OAuthClaims = {
   email: string | null;
   email_verified: boolean;
   name: string | null;
+  full_name: string | null;
   picture: string | null;
   handle: string | null;
   id_display_name: string | null;
+  username: string | null;
+  gender: string | null;
+  birthday: string | null;
+  phone: string | null;
 };
 
 export type OAuthTokenPayload = OAuthClaims & {
@@ -41,6 +36,22 @@ export function parseScopes(raw: string | null): OAuthScope[] {
     .filter((s): s is OAuthScope => (OAUTH_SCOPES as readonly string[]).includes(s));
   if (!scopes.includes("openid")) scopes.unshift("openid");
   return [...new Set(scopes)];
+}
+
+export function hasUnsupportedScopes(raw: string | null): boolean {
+  return (raw ?? "").split(/\s+/).filter(Boolean).some((scope) =>
+    !(OAUTH_SCOPES as readonly string[]).includes(scope)
+  );
+}
+
+export function signConsentRequest(fields: string[]): string {
+  return createHmac("sha256", getSecret()).update(JSON.stringify(fields)).digest("hex");
+}
+
+export function verifyConsentRequest(fields: string[], signature: string): boolean {
+  if (!/^[a-f0-9]{64}$/.test(signature)) return false;
+  const expected = Buffer.from(signConsentRequest(fields), "hex");
+  return timingSafeEqual(expected, Buffer.from(signature, "hex"));
 }
 
 function base64UrlEncode(input: Buffer): string {
@@ -73,8 +84,20 @@ export function signAccessToken(
   scopes: OAuthScope[]
 ): string {
   const now = Math.floor(Date.now() / 1000);
+  const granted = new Set(scopes);
   const payload: OAuthTokenPayload = {
-    ...claims,
+    sub: claims.sub,
+    email: granted.has("email") ? claims.email : null,
+    email_verified: granted.has("email") ? claims.email_verified : false,
+    name: granted.has("profile") ? claims.name : null,
+    full_name: granted.has("full_name") ? claims.full_name : null,
+    picture: granted.has("profile") || granted.has("avatar") ? claims.picture : null,
+    handle: granted.has("yavqoid") ? claims.handle : null,
+    id_display_name: granted.has("yavqoid") ? claims.id_display_name : null,
+    username: granted.has("username") ? claims.username : null,
+    gender: granted.has("gender") ? claims.gender : null,
+    birthday: granted.has("birthday") ? claims.birthday : null,
+    phone: granted.has("phone") ? claims.phone : null,
     iss: issuer,
     aud: clientId,
     scope: scopes.join(" "),
