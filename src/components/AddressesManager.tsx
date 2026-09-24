@@ -314,12 +314,14 @@ export default function AddressesManager({ userId, mapboxToken, initialAddresses
         <div className="settings-field settings-address-search">
           <label htmlFor="street_address">Street address</label>
           <input id="street_address" name="street_address" role={mapboxToken ? "combobox" : undefined} aria-autocomplete={mapboxToken ? "list" : undefined} aria-expanded={mapboxToken ? addressFocused && suggestions.length > 0 : undefined} aria-controls={addressFocused && suggestions.length > 0 ? "address-suggestions" : undefined} aria-activedescendant={addressFocused && suggestionIndex >= 0 ? `address-suggestion-${suggestionIndex}` : undefined} autoComplete="off" value={draft.street_address} onFocus={() => setAddressFocused(true)} onBlur={() => setAddressFocused(false)} onKeyDown={handleAddressKeyDown} onChange={(event) => updateStreetAddress(event.target.value)} aria-invalid={invalidField === "street_address"} aria-describedby={invalidField === "street_address" ? "address-form-error" : undefined} />
-          {addressFocused && suggestions.length > 0 && <div id="address-suggestions" className="settings-address-suggestions" role="listbox" aria-label="Suggested addresses">
-            {suggestions.map((suggestion, index) => <button id={`address-suggestion-${index}`} key={`${suggestion.mapbox_id}-${index}`} type="button" role="option" aria-selected={suggestionIndex === index} className="settings-address-suggestion" onMouseDown={(event) => event.preventDefault()} onClick={() => void chooseSuggestion(suggestion)}>
-              <MapPin size={17} aria-hidden="true" />
-              <span><strong>{suggestion.address_line1 || suggestion.feature_name}</strong><small>{suggestion.description || suggestion.full_address}</small></span>
-            </button>)}
-            <div className="settings-address-attribution">Address data © Mapbox</div>
+          {addressFocused && suggestions.length > 0 && <div className="settings-address-suggestions">
+            <p className="settings-address-suggestions-heading">Suggested addresses</p>
+            <div id="address-suggestions" role="listbox" aria-label="Suggested addresses">
+              {suggestions.map((suggestion, index) => <button id={`address-suggestion-${index}`} key={`${suggestion.mapbox_id}-${index}`} type="button" role="option" aria-selected={suggestionIndex === index} className="settings-address-suggestion" onMouseDown={(event) => event.preventDefault()} onClick={() => void chooseSuggestion(suggestion)}>
+                <MapPin size={17} aria-hidden="true" />
+                <span><strong>{suggestion.address_line1 || suggestion.feature_name}</strong><small>{suggestion.description || suggestion.full_address}</small></span>
+              </button>)}
+            </div>
           </div>}
           {mapboxToken && suggestionStatus === "loading" && addressFocused && <p className="settings-address-hint" role="status">Finding addresses…</p>}
           {mapboxToken && suggestionStatus === "error" && addressFocused && <p className="settings-address-hint" role="status">Suggestions unavailable. You can enter your address manually.</p>}

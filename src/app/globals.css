@@ -496,6 +496,7 @@ body {
 .settings-select svg { position: absolute; top: 50%; right: 14px; transform: translateY(-50%); color: var(--account-muted); pointer-events: none; }
 .settings-address-search { position: relative; }
 .settings-address-suggestions { position: absolute; z-index: 20; top: 76px; right: 0; left: 0; overflow: hidden; border: 1px solid var(--account-line); border-radius: 12px; background: #fff; box-shadow: 0 12px 28px #17212622; }
+.settings-address-suggestions-heading { padding: 10px 13px 8px; color: var(--account-muted); font-size: 12px; font-weight: 600; }
 .settings-address-suggestion { display: flex; width: 100%; align-items: flex-start; gap: 11px; padding: 11px 13px; text-align: left; }
 .settings-address-suggestion + .settings-address-suggestion { border-top: 1px solid var(--account-line); }
 .settings-address-suggestion:hover, .settings-address-suggestion[aria-selected="true"] { background: var(--account-soft); }
@@ -503,7 +504,6 @@ body {
 .settings-address-suggestion span { display: grid; min-width: 0; gap: 2px; }
 .settings-address-suggestion strong { font-size: 14px; font-weight: 600; }
 .settings-address-suggestion small { color: var(--account-muted); font-size: 13px; line-height: 1.4; }
-.settings-address-attribution { border-top: 1px solid var(--account-line); padding: 7px 13px; color: var(--account-muted); font-size: 11px; text-align: right; }
 .settings-address-hint { color: var(--account-muted); font-size: 13px; }
 .settings-maps-credit { justify-self: start; color: var(--account-blue); font-size: 12px; font-weight: 600; }
 .settings-maps-credit:hover { text-decoration: underline; text-underline-offset: 3px; }
