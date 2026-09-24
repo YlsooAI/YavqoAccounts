@@ -92,14 +92,45 @@
 .account-shell :is(button, a)[class*="bg-[#8ab4f8]"] { background: var(--account-blue); color: white; }
 .account-shell [class*="bg-[#8ab4f8]/"] { background: #e9f2ff; }
 .account-shell [class*="bg-white/"] { background: var(--account-soft); }
-.account-overview-profile { display: flex; align-items: center; gap: 24px; padding-bottom: 30px; border-bottom: 1px solid var(--account-line); }
-.account-overview-profile h2 { margin-top: 0; }
-.account-overview-avatar { position: relative; flex-shrink: 0; }
-.account-overview-grid { display: flex; flex-direction: column; gap: 0; }
-.account-overview-grid > a { border: 0; border-bottom: 1px solid var(--account-line); border-radius: 0; padding: 24px 0; }
-.account-overview-grid > a:hover { background: var(--account-soft); }
-.account-overview-grid > a > div > span { background: var(--account-soft) !important; color: var(--account-ink); }
-.account-overview-grid > a > div > span svg { color: var(--account-ink); }
+.account-shell-overview .account-content { padding-top: 56px; }
+.account-content > .account-overview { width: 100%; max-width: 1040px; }
+.overview-intro h1 { font-size: clamp(30px, 3vw, 38px); font-weight: 650; letter-spacing: -1.1px; line-height: 1.15; }
+.overview-intro p { margin-top: 9px; color: var(--account-muted); font-size: 16px; }
+.overview-profile { display: flex; align-items: center; gap: 22px; min-height: 164px; margin-top: 30px; border: 1px solid var(--account-line); border-radius: 18px; padding: 28px 32px; background: #f8fafc; }
+.account-overview-avatar { position: relative; flex: none; }
+.overview-avatar-image { width: 88px; height: 88px; font-size: 36px; }
+.account-overview-avatar button { background: #fff; color: var(--account-ink); box-shadow: 0 1px 6px #1721261a; }
+.account-overview-avatar button:hover { background: var(--account-soft); }
+.overview-profile-copy { min-width: 0; flex: 1; }
+.account-content .overview-profile-copy h2 { overflow-wrap: anywhere; font-size: 25px; font-weight: 650; letter-spacing: -.5px; }
+.overview-profile-copy p { overflow-wrap: anywhere; color: var(--account-muted); font-size: 14px; }
+.overview-profile-status { display: inline-block; margin-top: 9px; color: #26654a; font-size: 13px; font-weight: 600; }
+.overview-profile-action { display: inline-flex; align-items: center; gap: 5px; flex: none; min-height: 42px; border: 1px solid #bdc9d6; border-radius: 999px; padding: 8px 15px; color: var(--account-blue); font-size: 14px; font-weight: 600; }
+.overview-profile-action:hover { background: #edf4ff; }
+.overview-notice { display: flex; gap: 14px; margin-top: 20px; border: 1px solid #e5cf9b; border-radius: 14px; padding: 17px 20px; background: #fffaf0; color: #664d16; }
+.overview-notice > svg { flex: none; margin-top: 2px; }
+.overview-notice strong { font-size: 15px; }
+.overview-notice p { margin: 3px 0 8px; font-size: 14px; }
+.overview-notice a { display: inline-flex; align-items: center; color: var(--account-blue); font-size: 14px; font-weight: 600; }
+.overview-columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 30px; margin-top: 42px; }
+.overview-section { min-width: 0; }
+.overview-section-heading { margin-bottom: 14px; }
+.account-content .overview-section-heading h2, .account-content .overview-more h2 { font-size: 21px; font-weight: 650; letter-spacing: -.4px; }
+.overview-section-heading p { margin-top: 3px; color: var(--account-muted); font-size: 14px; }
+.overview-list { overflow: hidden; border: 1px solid var(--account-line); border-radius: 16px; background: #fff; }
+.overview-row { display: flex; align-items: center; gap: 16px; min-height: 86px; padding: 17px 20px; }
+.overview-row + .overview-row { border-top: 1px solid var(--account-line); }
+.overview-row:hover { background: #f8fafc; }
+.overview-row-icon { display: flex; width: 42px; height: 42px; flex: none; align-items: center; justify-content: center; border-radius: 12px; background: var(--account-soft); color: #3a566f; }
+.overview-row-copy { display: grid; flex: 1; min-width: 0; gap: 2px; }
+.overview-row-copy strong { font-size: 15px; font-weight: 600; }
+.overview-row-copy > span { overflow-wrap: anywhere; color: var(--account-muted); font-size: 13px; line-height: 1.35; }
+.overview-row-chevron { flex: none; color: var(--account-muted); }
+.overview-more { margin-top: 34px; border-top: 1px solid var(--account-line); padding-top: 26px; }
+.overview-more > div { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 14px; }
+.overview-more a { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; color: var(--account-blue); font-size: 14px; font-weight: 600; }
+.overview-more a:hover { text-decoration: underline; text-underline-offset: 4px; }
+.overview-more a svg:last-child { color: var(--account-muted); }
 * { scrollbar-width: thin; scrollbar-color: #aeb8c2 transparent; }
 *::-webkit-scrollbar { width: 10px; height: 10px; }
 *::-webkit-scrollbar-thumb { background: #aeb8c2; border: 3px solid transparent; background-clip: padding-box; border-radius: 10px; }
@@ -126,9 +157,11 @@
   .account-layout { min-height: calc(100dvh - 120px); }
   .account-content { padding: 36px 24px 56px; }
   .account-content h2 { font-size: 26px; }
-  .account-overview-profile { gap: 16px; align-items: flex-start; }
-  .account-overview-profile p { overflow-wrap: anywhere; }
-  .account-overview-avatar > :first-child { height: 64px; width: 64px; font-size: 28px; }
+  .account-shell-overview .account-content { padding-top: 34px; }
+  .overview-profile { flex-wrap: wrap; gap: 16px; padding: 20px; }
+  .overview-avatar-image { width: 70px; height: 70px; font-size: 29px; }
+  .overview-profile-action { margin-left: 86px; }
+  .overview-columns { grid-template-columns: 1fr; gap: 30px; margin-top: 34px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .account-shell *, .account-shell *::before, .account-shell *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }

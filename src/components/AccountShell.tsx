@@ -15,7 +15,7 @@ export default function AccountShell({ active, user, children }: {
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   return (
-    <div className={`account-shell${sidebarOpen ? "" : " sidebar-collapsed"}`}>
+    <div className={`account-shell${sidebarOpen ? "" : " sidebar-collapsed"}${active === "overview" ? " account-shell-overview" : ""}`}>
       <RememberCurrentAccount id={user.id} name={user.displayName} email={user.email} avatarUrl={user.avatarUrl} />
       <a href="#account-content" className="account-skip">Skip to content</a>
       <header className="account-header">

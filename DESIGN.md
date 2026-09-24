@@ -49,7 +49,8 @@ text and forms. Technical values keep their existing monospace treatment.
 
 72px header, sidebar up to 425px, 680px content measure. Document scrolling
 owns long pages. Below 768px a native details disclosure replaces the sidebar.
-The overview uses a profile header and divided settings rows.
+The overview uses a wide profile panel, two columns of divided settings rows,
+and a quiet row of additional destinations. On narrow screens the columns stack.
 
 OAuth consent follows the supplied Meta login reference: a top-aligned
 560px column, 24px outer gutters, back control, 25px heading, outlined
