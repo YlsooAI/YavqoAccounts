@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@mapbox/search-js-core": "1.6.0",
     "@stripe/react-stripe-js": "6.8.1",
     "@stripe/stripe-js": "9.13.0",
     "@supabase/ssr": "0.12.4",

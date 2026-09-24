@@ -1,7 +1,8 @@
 "use client";
 
-import { useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 import { ChevronDown, MapPin, Plus } from "lucide-react";
+import { AddressAutofillCore, SessionToken, type AddressAutofillSuggestion } from "@mapbox/search-js-core";
 import { createClient } from "@/lib/supabase/client";
 
 export type SavedAddress = {
@@ -49,8 +50,11 @@ function toDraft(address: SavedAddress): AddressDraft {
   };
 }
 
-export default function AddressesManager({ userId, initialAddresses, initialError }: { userId: string; initialAddresses: SavedAddress[]; initialError: string | null }) {
+export default function AddressesManager({ userId, mapboxToken, initialAddresses, initialError }: { userId: string; mapboxToken: string; initialAddresses: SavedAddress[]; initialError: string | null }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const autofillRef = useRef(mapboxToken ? new AddressAutofillCore({ accessToken: mapboxToken }) : null);
+  const sessionRef = useRef(new SessionToken());
+  const skipLookupRef = useRef(false);
   const [addresses, setAddresses] = useState(initialAddresses);
   const [loadError, setLoadError] = useState(initialError);
   const [formOpen, setFormOpen] = useState(false);
@@ -61,8 +65,97 @@ export default function AddressesManager({ userId, initialAddresses, initialErro
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const [addressFocused, setAddressFocused] = useState(false);
+  const [suggestions, setSuggestions] = useState<AddressAutofillSuggestion[]>([]);
+  const [suggestionIndex, setSuggestionIndex] = useState(-1);
+  const [suggestionStatus, setSuggestionStatus] = useState<"idle" | "loading" | "error">("idle");
+
+  useEffect(() => {
+    const autofill = autofillRef.current;
+    const query = draft.street_address.trim();
+    if (skipLookupRef.current) {
+      skipLookupRef.current = false;
+      return;
+    }
+    if (!formOpen || !addressFocused || !autofill || query.length < 3) {
+      return;
+    }
+    const controller = new AbortController();
+    const timer = window.setTimeout(async () => {
+      setSuggestionStatus("loading");
+      try {
+        const result = await autofill.suggest(query, { sessionToken: sessionRef.current, signal: controller.signal, limit: 5, proximity: "ip" });
+        if (!controller.signal.aborted) {
+          setSuggestions(result.suggestions);
+          setSuggestionIndex(-1);
+          setSuggestionStatus("idle");
+        }
+      } catch {
+        if (!controller.signal.aborted) {
+          setSuggestions([]);
+          setSuggestionStatus("error");
+        }
+      }
+    }, 300);
+    return () => { window.clearTimeout(timer); controller.abort(); };
+  }, [addressFocused, draft.street_address, formOpen]);
+
+  function updateStreetAddress(value: string) {
+    setDraft((current) => ({ ...current, street_address: value }));
+    setSuggestions([]);
+    setSuggestionIndex(-1);
+    setSuggestionStatus("idle");
+  }
+
+  async function chooseSuggestion(suggestion: AddressAutofillSuggestion) {
+    setAddressFocused(false);
+    setSuggestions([]);
+    setSuggestionStatus("idle");
+    const autofill = autofillRef.current;
+    let address = suggestion;
+    if (autofill?.canRetrieve(suggestion)) {
+      try {
+        const result = await autofill.retrieve(suggestion, { sessionToken: sessionRef.current });
+        address = { ...suggestion, ...result.features[0]?.properties };
+      } catch {
+        // The suggestion already contains the postal fields needed by the form.
+      }
+    }
+    sessionRef.current = new SessionToken();
+    skipLookupRef.current = true;
+    setDraft((current) => ({
+      ...current,
+      street_address: address.address_line1 || address.address || address.feature_name || current.street_address,
+      extended_address: address.address_line2 || current.extended_address,
+      city: address.address_level2 || address.address_level3 || current.city,
+      state: address.address_level1 || current.state,
+      postal_code: address.postcode || current.postal_code,
+      country: address.country || current.country,
+    }));
+    setInvalidField(null);
+  }
+
+  function handleAddressKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+    if (!suggestions.length) return;
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      setSuggestionIndex((index) => (index + 1) % suggestions.length);
+    } else if (event.key === "ArrowUp") {
+      event.preventDefault();
+      setSuggestionIndex((index) => (index + suggestions.length - 1) % suggestions.length);
+    } else if (event.key === "Enter" && suggestionIndex >= 0) {
+      event.preventDefault();
+      void chooseSuggestion(suggestions[suggestionIndex]);
+    } else if (event.key === "Escape") {
+      setSuggestions([]);
+      setSuggestionIndex(-1);
+    }
+  }
 
   function startAdd() {
+    sessionRef.current = new SessionToken();
+    setSuggestions([]);
+    setAddressFocused(false);
     setEditingId(null);
     setDraft(emptyDraft);
     setInvalidField(null);
@@ -72,6 +165,9 @@ export default function AddressesManager({ userId, initialAddresses, initialErro
   }
 
   function startEdit(address: SavedAddress) {
+    sessionRef.current = new SessionToken();
+    setSuggestions([]);
+    setAddressFocused(false);
     setEditingId(address.id);
     setDraft(toDraft(address));
     setInvalidField(null);
@@ -81,6 +177,8 @@ export default function AddressesManager({ userId, initialAddresses, initialErro
   }
 
   function cancelEdit() {
+    setSuggestions([]);
+    setAddressFocused(false);
     setFormOpen(false);
     setEditingId(null);
     setInvalidField(null);
@@ -213,7 +311,20 @@ export default function AddressesManager({ userId, initialAddresses, initialErro
       {formOpen && <form noValidate onSubmit={save} className="settings-form" aria-label={editingId ? "Edit address" : "Add address"}>
         <h2>{editingId ? "Edit address" : "Add an address"}</h2>
         <div className="settings-field"><label htmlFor="address-label">Address type</label><div className="settings-select"><select id="address-label" value={draft.label} onChange={(event) => setDraft((current) => ({ ...current, label: event.target.value as AddressDraft["label"] }))}><option>Home</option><option>Work</option><option>Billing</option><option>Shipping</option><option>Other</option></select><ChevronDown size={18} aria-hidden="true" /></div></div>
-        <div className="settings-field"><label htmlFor="street_address">Street address</label><input id="street_address" name="street_address" autoComplete="address-line1" value={draft.street_address} onChange={(event) => setDraft((current) => ({ ...current, street_address: event.target.value }))} aria-invalid={invalidField === "street_address"} aria-describedby={invalidField === "street_address" ? "address-form-error" : undefined} /></div>
+        <div className="settings-field settings-address-search">
+          <label htmlFor="street_address">Street address</label>
+          <input id="street_address" name="street_address" role={mapboxToken ? "combobox" : undefined} aria-autocomplete={mapboxToken ? "list" : undefined} aria-expanded={mapboxToken ? addressFocused && suggestions.length > 0 : undefined} aria-controls={addressFocused && suggestions.length > 0 ? "address-suggestions" : undefined} aria-activedescendant={addressFocused && suggestionIndex >= 0 ? `address-suggestion-${suggestionIndex}` : undefined} autoComplete="off" value={draft.street_address} onFocus={() => setAddressFocused(true)} onBlur={() => setAddressFocused(false)} onKeyDown={handleAddressKeyDown} onChange={(event) => updateStreetAddress(event.target.value)} aria-invalid={invalidField === "street_address"} aria-describedby={invalidField === "street_address" ? "address-form-error" : undefined} />
+          {addressFocused && suggestions.length > 0 && <div id="address-suggestions" className="settings-address-suggestions" role="listbox" aria-label="Suggested addresses">
+            {suggestions.map((suggestion, index) => <button id={`address-suggestion-${index}`} key={`${suggestion.mapbox_id}-${index}`} type="button" role="option" aria-selected={suggestionIndex === index} className="settings-address-suggestion" onMouseDown={(event) => event.preventDefault()} onClick={() => void chooseSuggestion(suggestion)}>
+              <MapPin size={17} aria-hidden="true" />
+              <span><strong>{suggestion.address_line1 || suggestion.feature_name}</strong><small>{suggestion.description || suggestion.full_address}</small></span>
+            </button>)}
+            <div className="settings-address-attribution">Address data © Mapbox</div>
+          </div>}
+          {mapboxToken && suggestionStatus === "loading" && addressFocused && <p className="settings-address-hint" role="status">Finding addresses…</p>}
+          {mapboxToken && suggestionStatus === "error" && addressFocused && <p className="settings-address-hint" role="status">Suggestions unavailable. You can enter your address manually.</p>}
+          <a className="settings-maps-credit" href="https://maps.yavqo.com" target="_blank" rel="noopener noreferrer">Powered by Yavqo Maps</a>
+        </div>
         <div className="settings-field"><label htmlFor="extended_address">Apartment, suite, or unit <span>(optional)</span></label><input id="extended_address" name="extended_address" autoComplete="address-line2" value={draft.extended_address} onChange={(event) => setDraft((current) => ({ ...current, extended_address: event.target.value }))} /></div>
         <div className="settings-field-grid">
           <div className="settings-field"><label htmlFor="city">City</label><input id="city" name="city" autoComplete="address-level2" value={draft.city} onChange={(event) => setDraft((current) => ({ ...current, city: event.target.value }))} aria-invalid={invalidField === "city"} aria-describedby={invalidField === "city" ? "address-form-error" : undefined} /></div>

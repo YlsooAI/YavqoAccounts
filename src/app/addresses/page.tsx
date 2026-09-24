@@ -20,6 +20,7 @@ export default async function AddressesPage() {
     <AccountShell active="addresses" user={user}>
       <AddressesManager
         userId={user.id}
+        mapboxToken={process.env.MAPBOX_PUBLIC_TOKEN ?? ""}
         initialAddresses={(data ?? []) as SavedAddress[]}
         initialError={error?.message ?? null}
       />
