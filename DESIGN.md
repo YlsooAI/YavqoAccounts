@@ -93,3 +93,11 @@ summary, grouped full-row destinations, and a quiet destructive section at the
 bottom. It uses the account blue for active actions and the shared white canvas,
 lines, and pill buttons. Setup and edit use the same palette. Destructive
 confirmation uses a focused dialog with clear consequences.
+
+## Account settings pages
+
+Notifications, preferences, and saved addresses use the same 680px content
+measure, white surfaces, thin dividers, blue actions, and quiet status messages
+as the rest of Account centre. Notification read state uses a pale blue row and
+a dot alongside its text label. Address forms stay in the document flow;
+deletion uses a focused confirmation dialog.

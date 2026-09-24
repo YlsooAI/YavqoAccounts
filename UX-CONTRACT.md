@@ -23,3 +23,19 @@ YavqoID home groups existing profile, people, app, and security destinations.
 The profile editor remains the owner of handle, name, bio, and photo changes.
 Deleting a YavqoID requires a modal confirmation naming the handle and leaves
 the Yavqo Account and existing TV friends intact.
+
+Notifications reads the latest 100 rows from the signed-in user's
+`notifications` table. The user may filter locally, refresh, mark one as read,
+or mark the shown unread rows as read. The page does not create notifications.
+
+Preferences saves the three existing `account_preferences` booleans explicitly
+through an upsert. No row uses the database defaults in the editor. The page
+states that each Yavqo service must consume those choices to affect its own
+behavior; saving a choice does not claim that all services already do so.
+
+Saved addresses owns the add/edit/delete flow for the signed-in user's
+`addresses` rows. Required fields are validated inline. The address-type
+dropdown is native; the operating system owns its popup. The first address is
+saved as default. Changing the default clears the prior default before setting
+the chosen address and reloads after a failed change. Deletion names the
+address in a native modal dialog and requires a second action.
