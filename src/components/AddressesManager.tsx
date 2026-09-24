@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, type FormEvent } from "react";
-import { MapPin, Plus } from "lucide-react";
+import { ChevronDown, MapPin, Plus } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
 export type SavedAddress = {
@@ -212,7 +212,7 @@ export default function AddressesManager({ userId, initialAddresses, initialErro
 
       {formOpen && <form noValidate onSubmit={save} className="settings-form" aria-label={editingId ? "Edit address" : "Add address"}>
         <h2>{editingId ? "Edit address" : "Add an address"}</h2>
-        <div className="settings-field"><label htmlFor="address-label">Address type</label><select id="address-label" value={draft.label} onChange={(event) => setDraft((current) => ({ ...current, label: event.target.value as AddressDraft["label"] }))}><option>Home</option><option>Work</option><option>Billing</option><option>Shipping</option><option>Other</option></select></div>
+        <div className="settings-field"><label htmlFor="address-label">Address type</label><div className="settings-select"><select id="address-label" value={draft.label} onChange={(event) => setDraft((current) => ({ ...current, label: event.target.value as AddressDraft["label"] }))}><option>Home</option><option>Work</option><option>Billing</option><option>Shipping</option><option>Other</option></select><ChevronDown size={18} aria-hidden="true" /></div></div>
         <div className="settings-field"><label htmlFor="street_address">Street address</label><input id="street_address" name="street_address" autoComplete="address-line1" value={draft.street_address} onChange={(event) => setDraft((current) => ({ ...current, street_address: event.target.value }))} aria-invalid={invalidField === "street_address"} aria-describedby={invalidField === "street_address" ? "address-form-error" : undefined} /></div>
         <div className="settings-field"><label htmlFor="extended_address">Apartment, suite, or unit <span>(optional)</span></label><input id="extended_address" name="extended_address" autoComplete="address-line2" value={draft.extended_address} onChange={(event) => setDraft((current) => ({ ...current, extended_address: event.target.value }))} /></div>
         <div className="settings-field-grid">

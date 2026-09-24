@@ -451,6 +451,9 @@ body {
 .settings-field label { font-size: 14px; font-weight: 600; }
 .settings-field label span { color: var(--account-muted); font-weight: 400; }
 .account-content .settings-field input, .account-content .settings-field select { width: 100%; min-height: 46px; border: 1px solid #bcc5ce; border-radius: 10px; padding: 10px 13px; background: #fff; color: var(--account-ink); font-size: 15px; }
+.settings-select { position: relative; }
+.account-content .settings-select select { display: block; height: 46px; appearance: none; -webkit-appearance: none; padding: 0 42px 0 13px; line-height: normal; cursor: pointer; }
+.settings-select svg { position: absolute; top: 50%; right: 14px; transform: translateY(-50%); color: var(--account-muted); pointer-events: none; }
 .account-content .settings-field input[aria-invalid="true"] { border-color: #b42318; }
 .settings-field-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 17px; }
 .settings-address { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 14px 22px; padding: 20px 22px; }
