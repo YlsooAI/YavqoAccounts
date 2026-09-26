@@ -14,6 +14,7 @@ import {
 } from "@/lib/oauth";
 import { AuthorizeButton, CancelButton } from "@/components/OAuthConsentButtons";
 import OAuthPasskeyGate from "@/components/OAuthPasskeyGate";
+import { sendOAuthAuthorizationEmail } from "@/lib/oauth-notification";
 
 export const dynamic = "force-dynamic";
 
@@ -198,6 +199,19 @@ async function completeConsent(formData: FormData, approved: boolean) {
     { onConflict: "user_id,client_id" }
   );
   if (authorizationError) redirect("/");
+
+  if (user.email) {
+    try {
+      await sendOAuthAuthorizationEmail({
+        to: user.email,
+        clientName: client.name,
+        siteHost,
+        authorizationCode: code,
+      });
+    } catch (notificationError) {
+      console.error("OAuth authorization email failed", notificationError);
+    }
+  }
 
   const url = new URL(redirectUri);
   url.searchParams.set("code", code);

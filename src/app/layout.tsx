@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 import type { Metadata } from "next";
 import "./globals.css";
+import { Suspense } from "react";
+import LanguageSelector from "@/components/LanguageSelector";
 
 export const metadata: Metadata = {
   title: "Yavqo Account",
@@ -13,7 +15,7 @@ export default function RootLayout({
 }: Readonly<{ children: ReactNode }>) {
   return (
     <html lang="en" className="h-full antialiased">
-      <body className="flex min-h-full flex-col">{children}</body>
+      <body className="flex min-h-full flex-col">{children}<Suspense fallback={null}><LanguageSelector /></Suspense></body>
     </html>
   );
 }

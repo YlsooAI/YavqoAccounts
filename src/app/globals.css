@@ -1,5 +1,23 @@
 @import "tailwindcss";
 
+.language-control { position: fixed; right: 22px; bottom: 18px; z-index: 90; font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; }
+.language-trigger { display: inline-flex; align-items: center; gap: 8px; min-height: 38px; padding: 7px 12px; border: 1px solid #d5dbe1; border-radius: 999px; background: #fff; box-shadow: 0 2px 12px #17212614; color: #172126; font-size: 13px; font-weight: 600; cursor: pointer; }
+.language-trigger:hover { background: #f1f4f7; }
+.language-error { display: block; margin-top: 5px; color: #b42318; font-size: 11px; text-align: right; }
+.language-backdrop { position: fixed; inset: 0; display: grid; place-items: center; padding: 20px; background: #0008; }
+.language-dialog { position: relative; width: min(100%, 560px); padding: 48px 48px 38px; border-radius: 32px; background: #fff; box-shadow: 0 24px 80px #0003; color: #172126; }
+.language-dialog h2 { margin: 0 50px 38px 0; font-size: clamp(25px, 4vw, 30px); font-weight: 500; line-height: 1.2; }
+.language-close { position: absolute; top: 40px; right: 42px; display: grid; width: 42px; height: 42px; place-items: center; border: 2px solid #0051c8; border-radius: 50%; color: #172126; cursor: pointer; }
+.language-field { position: relative; display: block; border: 1px solid #929ba4; border-radius: 13px; padding: 9px 16px 7px; }
+.language-field span { display: block; color: #52657a; font-size: 12px; }
+.language-field select { width: 100%; padding-right: 32px; appearance: none; border: 0; outline: 0; background: transparent; color: #172126; font-size: 17px; cursor: pointer; }
+.language-field svg { position: absolute; right: 16px; bottom: 13px; pointer-events: none; }
+.language-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
+.language-actions button { min-height: 44px; padding: 0 23px; border: 2px solid #dce1e5; border-radius: 999px; color: #0051c8; font-size: 14px; font-weight: 650; cursor: pointer; }
+.language-actions .language-confirm { border-color: #0051c8; background: #0051c8; color: #fff; }
+.language-actions .language-confirm:disabled { border-color: #ccd2d9; background: #ccd2d9; color: #82909e; cursor: not-allowed; }
+@media (max-width: 600px) { .language-dialog { padding: 34px 24px 28px; border-radius: 26px; } .language-close { top: 24px; right: 22px; } }
+
 /* Account theme: runtime source for DESIGN.md. Scoped so sign-in retains its theme. */
 .account-shell {
   --account-ink: #172126;
