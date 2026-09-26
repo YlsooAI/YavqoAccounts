@@ -158,9 +158,9 @@
   .account-content { padding: 36px 24px 56px; }
   .account-content h2 { font-size: 26px; }
   .account-shell-overview .account-content { padding-top: 34px; }
-  .overview-profile { flex-wrap: wrap; gap: 16px; padding: 20px; }
+  .overview-profile { display: grid; grid-template-columns: 70px minmax(0, 1fr); gap: 16px; padding: 20px; }
   .overview-avatar-image { width: 70px; height: 70px; font-size: 29px; }
-  .overview-profile-action { margin-left: 86px; }
+  .overview-profile-action { grid-column: 2; justify-self: start; margin-left: 0; }
   .overview-columns { grid-template-columns: 1fr; gap: 30px; margin-top: 34px; }
 }
 @media (prefers-reduced-motion: reduce) {
