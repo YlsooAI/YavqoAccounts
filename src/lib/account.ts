@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { needsSecondStep } from "@/lib/security";
 
 export type AccountUser = {
   id: string;
@@ -11,10 +12,18 @@ export type AccountUser = {
   lastSignInAt: string | null;
 };
 
-export async function getAccountUser(): Promise<AccountUser> {
+// `returnTo` is where the 2-Step Verification sign-in step sends the user
+// back to when this session has not entered its code yet.
+export async function getAccountUser(returnTo = "/"): Promise<AccountUser> {
   const supabase = await createClient();
-  const { data } = await supabase.auth.getUser();
+  const [{ data }, { data: claimsData }] = await Promise.all([
+    supabase.auth.getUser(),
+    supabase.auth.getClaims(),
+  ]);
   if (!data.user) redirect("/login");
+  if (needsSecondStep(data.user, claimsData?.claims)) {
+    redirect(`/login/verify?next=${encodeURIComponent(returnTo)}`);
+  }
 
   const email = data.user.email ?? "";
   const localPart = email.split("@")[0] ?? "";

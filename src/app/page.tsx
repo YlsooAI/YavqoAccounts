@@ -8,6 +8,7 @@ import {
   Link2,
   Lock,
   MapPin,
+  ShieldAlert,
   SlidersHorizontal,
   Tv,
   Users,
@@ -20,6 +21,7 @@ import AvatarUploadButton from "@/components/AvatarUploadButton";
 import ResendVerificationButton from "@/components/ResendVerificationButton";
 import { createClient } from "@/lib/supabase/server";
 import { getAccountUser } from "@/lib/account";
+import { getSecurityStatus } from "@/lib/security";
 
 export const dynamic = "force-dynamic";
 
@@ -33,8 +35,9 @@ export default async function AccountPage() {
   const user = await getAccountUser();
   const supabase = await createClient();
 
-  const [passwords, contacts, friends, membership, subscription] =
+  const [security, passwords, contacts, friends, membership, subscription] =
     await Promise.all([
+      getSecurityStatus(supabase),
       supabase.from("saved_passwords").select("*", { count: "exact", head: true }).eq("user_id", user.id),
       supabase.from("contacts").select("*", { count: "exact", head: true }).eq("user_id", user.id),
       supabase.from("tv_friends").select("*", { count: "exact", head: true }).or("user_id.eq." + user.id + ",friend_id.eq." + user.id),
@@ -88,8 +91,19 @@ export default async function AccountPage() {
             <CircleAlert size={20} aria-hidden="true" />
             <div>
               <strong>Confirm your email address</strong>
-              <p>We sent a confirmation link to {user.email}. Some account features stay limited until you confirm it.</p>
+              <p>We sent a confirmation link to {user.email}. Payment methods and developer credentials stay locked until you confirm it.</p>
               <ResendVerificationButton email={user.email} />
+            </div>
+          </div>
+        )}
+
+        {security?.emailConfirmed && !security.twoStepEnabled && (
+          <div className="overview-notice" role="status">
+            <ShieldAlert size={20} aria-hidden="true" />
+            <div>
+              <strong>Turn on 2-Step Verification</strong>
+              <p>Payment methods, saved passwords, and developer credentials stay locked until your account has 2-Step Verification.</p>
+              <Link href="/security#two-step">Finish security checkup <ChevronRight size={15} aria-hidden="true" /></Link>
             </div>
           </div>
         )}
@@ -112,7 +126,7 @@ export default async function AccountPage() {
               <p>Keep your essentials up to date.</p>
             </div>
             <div className="overview-list">
-              <OverviewRow href="/security" icon={Lock} title="Security & sign-in" detail={lastSignIn ? "Last sign-in " + lastSignIn : "Manage your sign-in options"} />
+              <OverviewRow href="/security" icon={Lock} title="Security & sign-in" detail={securityDetail(security, lastSignIn)} />
               <OverviewRow href="/wallet" icon={Wallet} title="Wallet & subscriptions" detail={subscriptionLabel(sub)} />
               <OverviewRow href="/password" icon={KeyRound} title="Saved passwords" detail={pluralCount(passwordCount, "password")} />
               <OverviewRow href="/addresses" icon={MapPin} title="Saved addresses" detail="Manage the places you use" />
@@ -144,6 +158,19 @@ export default async function AccountPage() {
       </div>
     </AccountShell>
   );
+}
+
+function securityDetail(
+  security: Awaited<ReturnType<typeof getSecurityStatus>>,
+  lastSignIn: string | null
+): string {
+  const requiredLeft = security
+    ? Number(!security.emailConfirmed) + Number(!security.twoStepEnabled)
+    : 0;
+  if (requiredLeft > 0) {
+    return requiredLeft + " required security " + (requiredLeft === 1 ? "step" : "steps") + " left";
+  }
+  return lastSignIn ? "Last sign-in " + lastSignIn : "Manage your sign-in options";
 }
 
 function pluralCount(count: number, noun: string): string {

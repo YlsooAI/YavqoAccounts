@@ -39,3 +39,19 @@ dropdown is native; the operating system owns its popup. The first address is
 saved as default. Changing the default clears the prior default before setting
 the chosen address and reloads after a failed change. Deletion names the
 address in a native modal dialog and requires a second action.
+
+Security checkup on Password & security lists the required steps (confirmed
+email, 2-Step Verification) and the recommended ones (passkey, recovery phone).
+Accounts with 2-Step Verification finish every sign-in on `/login/verify`;
+account pages redirect there until the session has entered its code or used a
+passkey. Protected features stay locked until their requirements are met:
+
+| Feature | Requires | Enforced by |
+| --- | --- | --- |
+| Payment methods (add, remove) | Confirmed email, 2-Step Verification, code entered in the last 15 minutes | SecurityGate on `/wallet`, wallet API routes |
+| Saved passwords | 2-Step Verification, code entered in the last 15 minutes | SecurityGate on `/password`, `saved_passwords` restrictive RLS |
+| Developer credentials | Confirmed email, 2-Step Verification | SecurityGate on `/developers/oauth`, `id_oauth_clients` insert trigger |
+
+Finishing a card verification that has already started is never blocked, so
+the €1 charge is always refunded. Turning off 2-Step Verification asks for
+confirmation and names the features it locks.

@@ -4,7 +4,11 @@ import ChangePasswordCard from "@/components/ChangePasswordCard";
 import ResendVerificationButton from "@/components/ResendVerificationButton";
 import TwoStepVerificationCard from "@/components/TwoStepVerificationCard";
 import SecurityActivityCard from "@/components/SecurityActivityCard";
+import SecurityCheckupCard from "@/components/SecurityCheckupCard";
+import PasskeysCard from "@/components/PasskeysCard";
 import { getAccountUser } from "@/lib/account";
+import { getSecurityStatus } from "@/lib/security";
+import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
@@ -19,7 +23,8 @@ function formatSignIn(iso: string | null): string {
 }
 
 export default async function SecurityPage() {
-  const user = await getAccountUser();
+  const user = await getAccountUser("/security");
+  const security = await getSecurityStatus(await createClient());
 
   return (
     <AccountShell active="security" user={user}>
@@ -29,19 +34,27 @@ export default async function SecurityPage() {
           Control how you sign in to your Yavqo Account and keep it safe.
         </p>
 
-        <section className="mt-8 rounded-2xl border border-[#3c4043] px-6">
+        {security && <SecurityCheckupCard status={security} />}
+
+        <section className="mt-6 rounded-2xl border border-[#3c4043] px-6">
           <h3 className="border-b border-[#3c4043] py-4 text-[16px]">
             How you sign in to Yavqo
           </h3>
 
           <ChangePasswordCard email={user.email} />
 
-          <div className="border-t border-[#3c4043]">
+          <div id="two-step" className="scroll-mt-24 border-t border-[#3c4043]">
             <TwoStepVerificationCard />
           </div>
+
+          {security?.passkeysAvailable && (
+            <div className="border-t border-[#3c4043]">
+              <PasskeysCard />
+            </div>
+          )}
         </section>
 
-        <section className="mt-6 rounded-2xl border border-[#3c4043] px-6">
+        <section id="account-status" className="mt-6 scroll-mt-24 rounded-2xl border border-[#3c4043] px-6">
           <h3 className="border-b border-[#3c4043] py-4 text-[16px]">
             Account status
           </h3>

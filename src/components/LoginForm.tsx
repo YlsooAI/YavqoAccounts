@@ -50,7 +50,13 @@ export default function LoginForm() {
             maskedEmail: maskEmail(address), avatarUrl: null,
           });
         }
-        router.push(nextTarget);
+        // Accounts with 2-Step Verification finish signing in with a code.
+        const { data: assurance } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+        if (assurance?.nextLevel === "aal2" && assurance.currentLevel !== "aal2") {
+          router.push(`/login/verify?next=${encodeURIComponent(nextTarget)}`);
+        } else {
+          router.push(nextTarget);
+        }
         router.refresh();
       }
     } else {

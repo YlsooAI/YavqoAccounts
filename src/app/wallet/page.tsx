@@ -6,6 +6,8 @@ import { finalizeCardPayment } from "@/lib/cards";
 import { isStripeConfigured } from "@/lib/stripe";
 import { createClient } from "@/lib/supabase/server";
 import { getAccountUser } from "@/lib/account";
+import SecurityGate from "@/components/SecurityGate";
+import { getSecurityStatus } from "@/lib/security";
 
 export const dynamic = "force-dynamic";
 
@@ -35,8 +37,9 @@ export default async function WalletPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const user = await getAccountUser();
+  const user = await getAccountUser("/wallet");
   const supabase = await createClient();
+  const security = await getSecurityStatus(supabase);
 
   const { data: subscription } = await supabase
     .from("subscriptions")
@@ -196,18 +199,20 @@ export default async function WalletPage({
           )}
         </section>
 
-        <section className="mt-6 rounded-2xl border border-[#3c4043] px-6">
-          <h3 className="border-b border-[#3c4043] py-4 text-[16px]">
-            Payment methods
-          </h3>
-          <CardManager
-            cards={cards}
-            publishableKey={
-              process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? null
-            }
-            notice={cardNotice}
-          />
-        </section>
+        <SecurityGate feature="payment-methods" status={security}>
+          <section className="mt-6 rounded-2xl border border-[#3c4043] px-6">
+            <h3 className="border-b border-[#3c4043] py-4 text-[16px]">
+              Payment methods
+            </h3>
+            <CardManager
+              cards={cards}
+              publishableKey={
+                process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? null
+              }
+              notice={cardNotice}
+            />
+          </section>
+        </SecurityGate>
 
         <Link
           href="/invoices"

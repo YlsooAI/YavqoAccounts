@@ -1,4 +1,5 @@
 import { isStripeConfigured, getStripe, resolveCustomerId } from "@/lib/stripe";
+import { lockedFeatureResponse } from "@/lib/security";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -13,6 +14,8 @@ export async function POST() {
   if (!user) {
     return Response.json({ error: "Not signed in." }, { status: 401 });
   }
+  const locked = await lockedFeatureResponse(supabase, "payment-methods");
+  if (locked) return locked;
   if (!isStripeConfigured()) {
     return Response.json(
       { error: "Payments are not configured on this server yet." },

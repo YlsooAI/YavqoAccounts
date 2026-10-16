@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import type { AuthMFAListFactorsResponse } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
 
@@ -16,10 +17,12 @@ const inputClass =
   "h-11 w-full rounded-lg border border-[#5f6368] bg-transparent px-3 text-center text-[16px] tracking-[0.3em] text-[#e8eaed] outline-none transition-colors placeholder:tracking-normal placeholder:text-[#9aa0a6] focus:border-[#8ab4f8]";
 
 export default function TwoStepVerificationCard() {
+  const router = useRouter();
   const [enabled, setEnabled] = useState(false);
   const [phase, setPhase] = useState<Phase>("busy");
   const [enrollment, setEnrollment] = useState<Enrollment | null>(null);
   const [code, setCode] = useState("");
+  const [confirmOff, setConfirmOff] = useState(false);
   const [message, setMessage] = useState<{
     kind: "error" | "success";
     text: string;
@@ -105,9 +108,20 @@ export default function TwoStepVerificationCard() {
     setCode("");
     setPhase("idle");
     setMessage({ kind: "success", text: "2-Step Verification is turned on." });
+    // Re-render the security checkup and unlock protected features.
+    router.refresh();
   }
 
   async function turnOff() {
+    if (!confirmOff) {
+      setConfirmOff(true);
+      setMessage({
+        kind: "error",
+        text: "Turning this off locks payment methods, saved passwords, and developer credentials. Select Confirm to continue.",
+      });
+      return;
+    }
+    setConfirmOff(false);
     const supabase = createClient();
     const { data } = await supabase.auth.mfa.listFactors();
     const factors = data?.totp ?? [];
@@ -125,7 +139,11 @@ export default function TwoStepVerificationCard() {
     }
     setEnabled(false);
     setPhase("idle");
-    setMessage({ kind: "success", text: "2-Step Verification is turned off." });
+    setMessage({
+      kind: "success",
+      text: "2-Step Verification is turned off. Payment methods, saved passwords, and developer credentials are locked until you turn it back on.",
+    });
+    router.refresh();
   }
 
   return (
@@ -155,7 +173,9 @@ export default function TwoStepVerificationCard() {
                 ? "Turning off…"
                 : "Setting up…"
               : enabled
-                ? "Turn off"
+                ? confirmOff
+                  ? "Confirm"
+                  : "Turn off"
                 : "Turn on"}
           </button>
         )}

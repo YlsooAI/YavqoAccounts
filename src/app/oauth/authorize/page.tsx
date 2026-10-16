@@ -249,13 +249,13 @@ export default async function OAuthAuthorizePage({
 
   const { client, redirectUri, scopes, state, codeChallenge, codeChallengeMethod } =
     resolved.request;
-  const user = await getAccountUser();
   const targetHost = new URL(redirectUri).hostname;
   const query = new URLSearchParams();
   for (const [key, value] of Object.entries(params)) {
     if (typeof value === "string") query.set(key, value);
     else if (Array.isArray(value)) value.forEach((item) => query.append(key, item));
   }
+  const user = await getAccountUser(`/oauth/authorize?${query.toString()}`);
   const chooserHref = `/accounts?next=${encodeURIComponent(`/oauth/authorize?${query.toString()}`)}`;
   const supabase = await createClient();
   const [passkeyResult, factorResult, claimsResult] = await Promise.all([
