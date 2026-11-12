@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { ACTIVE_SLOT_COOKIE, cookieNameForSlot, validSlot } from "@/lib/account-slots";
+import { ACCOUNT_SELECTED_COOKIE, signCookieToken } from "@/lib/oauth";
 import { getSupabaseEnv } from "@/lib/supabase/env";
 
 export async function POST(request: NextRequest) {
@@ -49,11 +50,27 @@ export async function POST(request: NextRequest) {
     }
   }
 
+  const secure = request.nextUrl.protocol === "https:";
   response.cookies.set(ACTIVE_SLOT_COOKIE, slot, {
     path: "/",
     sameSite: "lax",
-    secure: request.nextUrl.protocol === "https:",
+    secure,
     maxAge: 60 * 60 * 24 * 30,
   });
+  try {
+    response.cookies.set(
+      ACCOUNT_SELECTED_COOKIE,
+      signCookieToken({ slot }, 300),
+      {
+        path: "/",
+        httpOnly: true,
+        sameSite: "lax",
+        secure,
+        maxAge: 300,
+      }
+    );
+  } catch {
+    // OAUTH_JWT_SECRET may not be configured in minimal setups; switching still works.
+  }
   return response;
 }

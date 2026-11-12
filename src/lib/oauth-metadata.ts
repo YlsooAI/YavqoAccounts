@@ -1,0 +1,71 @@
+import {
+  OAUTH_SCOPES,
+  getActiveSigningAlg,
+  getOAuthIssuer,
+} from "@/lib/oauth";
+
+export function buildOAuthServerMetadata(requestUrl: string) {
+  const issuer = getOAuthIssuer(requestUrl);
+  return {
+    issuer,
+    authorization_endpoint: `${issuer}/oauth/authorize`,
+    token_endpoint: `${issuer}/oauth/token`,
+    userinfo_endpoint: `${issuer}/oauth/userinfo`,
+    revocation_endpoint: `${issuer}/oauth/revoke`,
+    introspection_endpoint: `${issuer}/oauth/introspect`,
+    jwks_uri: `${issuer}/.well-known/jwks.json`,
+    response_types_supported: ["code"],
+    response_modes_supported: ["query"],
+    grant_types_supported: [
+      "authorization_code",
+      "refresh_token",
+      "client_credentials",
+    ],
+    subject_types_supported: ["public"],
+    id_token_signing_alg_values_supported: [getActiveSigningAlg()],
+    scopes_supported: [...OAUTH_SCOPES],
+    token_endpoint_auth_methods_supported: [
+      "client_secret_basic",
+      "client_secret_post",
+      "none",
+    ],
+    revocation_endpoint_auth_methods_supported: [
+      "client_secret_basic",
+      "client_secret_post",
+      "none",
+    ],
+    introspection_endpoint_auth_methods_supported: [
+      "client_secret_basic",
+      "client_secret_post",
+    ],
+    code_challenge_methods_supported: ["S256", "plain"],
+    prompt_values_supported: ["none", "login", "consent", "select_account"],
+    backchannel_logout_supported: true,
+    backchannel_logout_session_supported: true,
+    claims_supported: [
+      "sub",
+      "iss",
+      "aud",
+      "exp",
+      "iat",
+      "auth_time",
+      "nonce",
+      "at_hash",
+      "email",
+      "email_verified",
+      "name",
+      "full_name",
+      "picture",
+      "avatar_url",
+      "yavqoid_handle",
+      "yavqoid_name",
+      "username",
+      "preferred_username",
+      "gender",
+      "birthday",
+      "birthdate",
+      "phone",
+      "phone_number",
+    ],
+  };
+}

@@ -6,9 +6,14 @@ const PUBLIC_PATHS = [
   "/login",
   "/accounts",
   "/api/accounts",
+  "/api/oauth",
   "/auth/callback",
+  "/oauth/authorize",
   "/oauth/token",
   "/oauth/userinfo",
+  "/oauth/revoke",
+  "/oauth/introspect",
+  "/.well-known",
   "/api/wallet",
 ];
 
@@ -73,6 +78,9 @@ export async function proxy(request: NextRequest) {
   }
 
   if (hasSession && pathname === "/login") {
+    if (request.nextUrl.searchParams.get("prompt") === "login") {
+      return supabaseResponse;
+    }
     const next = request.nextUrl.searchParams.get("next");
     if (next && safeInternalPath(next) === next) {
       return NextResponse.redirect(new URL(next, request.url));

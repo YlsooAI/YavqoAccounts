@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Globe, Trash2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { faviconUrl } from "@/lib/connectedApps";
+import { OAUTH_SCOPES, SCOPE_DESCRIPTIONS, type OAuthScope } from "@/lib/oauth-scopes";
 
 type Authorization = {
   id: string;
@@ -51,16 +52,21 @@ export default function ConnectedAppsManager({ userId }: { userId: string }) {
       setRevokingId(app.id);
       return;
     }
-    const supabase = createClient();
-    const { error: deleteError } = await supabase
-      .from("id_oauth_authorizations")
-      .delete()
-      .eq("id", app.id)
-      .eq("user_id", userId);
-    if (deleteError) {
-      setError(deleteError.message);
-    } else {
-      setApps((prev) => prev.filter((item) => item.id !== app.id));
+    try {
+      const response = await fetch("/api/oauth/connected-apps/revoke", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ authorizationId: app.id }),
+      });
+      const result = (await response.json()) as { error?: string };
+      if (!response.ok) {
+        setError(result.error ?? "Could not revoke access.");
+      } else {
+        setApps((prev) => prev.filter((item) => item.id !== app.id));
+        setError(null);
+      }
+    } catch {
+      setError("Could not revoke access.");
     }
     setRevokingId(null);
   }
@@ -70,7 +76,7 @@ export default function ConnectedAppsManager({ userId }: { userId: string }) {
       <h2 className="text-[24px] font-normal">Connected apps</h2>
       <p className="mt-2 text-[13px] text-[#9aa0a6]">
         Websites and apps that can access your Yavqo Account. Revoking an app
-        blocks its access token on the next profile request.
+        immediately invalidates its access and refresh tokens.
       </p>
 
       {error && (
@@ -127,8 +133,28 @@ export default function ConnectedAppsManager({ userId }: { userId: string }) {
                     {new Date(app.granted_at).toLocaleDateString("en-US", {
                       dateStyle: "medium",
                     })}
-                    {app.scope ? ` · ${app.scope}` : ""}
+                    {app.last_used_at
+                      ? ` · Last used ${new Date(app.last_used_at).toLocaleDateString("en-US", { dateStyle: "medium" })}`
+                      : ""}
                   </p>
+                  {app.scope && (
+                    <ul className="mt-2 flex flex-wrap gap-1.5" aria-label="Granted permissions">
+                      {app.scope
+                        .split(/\s+/)
+                        .filter((s): s is OAuthScope =>
+                          (OAUTH_SCOPES as readonly string[]).includes(s)
+                        )
+                        .map((scope) => (
+                          <li
+                            key={scope}
+                            title={SCOPE_DESCRIPTIONS[scope]}
+                            className="rounded-full border border-[#3c4043] bg-[#202124] px-2.5 py-0.5 text-[11px] text-[#bdc1c6]"
+                          >
+                            {scope}
+                          </li>
+                        ))}
+                    </ul>
+                  )}
                 </div>
                 <button
                   type="button"

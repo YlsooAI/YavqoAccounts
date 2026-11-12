@@ -44,6 +44,12 @@ export default function DeleteAccountForm({
     const supabase = createClient();
 
     try {
+      await fetch("/api/oauth/backchannel-logout-all", { method: "POST" });
+    } catch {
+      // Back-channel logout notifications are best-effort.
+    }
+
+    try {
       await emptyFolder(supabase, "avatars", userId);
       await emptyFolder(supabase, "files", userId);
     } catch {

@@ -11,19 +11,32 @@ export default function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  const confirmationFailed = searchParams.get("error") === "confirmation-failed";
+  const accountDeleted = searchParams.get("deleted") === "1";
+  const promptLogin = searchParams.get("prompt") === "login";
+  const loginHint = searchParams.get("login_hint")?.trim() ?? "";
+
   const [mode, setMode] = useState<"signin" | "signup">("signin");
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(() =>
+    loginHint.includes("@") ? loginHint : ""
+  );
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const confirmationFailed = searchParams.get("error") === "confirmation-failed";
-  const accountDeleted = searchParams.get("deleted") === "1";
-
   // Resume an OAuth authorize request (or other internal page) after login.
   const nextParam = searchParams.get("next");
   const nextTarget = safeInternalPath(nextParam);
+
+  async function stampOAuthReauthIfNeeded() {
+    if (!promptLogin && !nextTarget.startsWith("/oauth/authorize")) return;
+    try {
+      await fetch("/api/oauth/reauth", { method: "POST" });
+    } catch {
+      // Best-effort; sign-in itself succeeded.
+    }
+  }
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -50,6 +63,7 @@ export default function LoginForm() {
             maskedEmail: maskEmail(address), avatarUrl: null,
           });
         }
+        await stampOAuthReauthIfNeeded();
         router.push(nextTarget);
         router.refresh();
       }
@@ -68,6 +82,7 @@ export default function LoginForm() {
             maskedEmail: maskEmail(email), avatarUrl: null,
           });
         }
+        await stampOAuthReauthIfNeeded();
         router.push(nextTarget);
         router.refresh();
       } else {
@@ -86,7 +101,11 @@ export default function LoginForm() {
       <section className="public-login" aria-labelledby="login-title">
         <p className="public-overline">Yavqo Accounts</p>
         <h1 id="login-title">{mode === "signin" ? "Log in to your account" : "Create your account"}</h1>
-        <p className="public-description">One account for everything Yavqo.</p>
+        <p className="public-description">
+          {promptLogin
+            ? "Confirm your sign-in credentials to continue."
+            : "One account for everything Yavqo."}
+        </p>
         <form onSubmit={handleSubmit} noValidate className="public-form">
           <div className="public-field"><label htmlFor="login-email">Email address</label><input id="login-email" type="email" required autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="Enter your email address" aria-invalid={!!error} /></div>
           <div className="public-field"><label htmlFor="login-password">Password</label><input id="login-password" type="password" required minLength={6} autoComplete={mode === "signin" ? "current-password" : "new-password"} value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Enter your password" aria-invalid={!!error} /></div>

@@ -1,10 +1,24 @@
-export const OAUTH_SCOPES = ["openid", "profile", "email", "yavqoid", "full_name", "avatar", "username", "gender", "birthday", "phone"] as const;
+export const OAUTH_SCOPES = [
+  "openid",
+  "profile",
+  "email",
+  "offline_access",
+  "yavqoid",
+  "full_name",
+  "avatar",
+  "username",
+  "gender",
+  "birthday",
+  "phone",
+] as const;
+
 export type OAuthScope = (typeof OAUTH_SCOPES)[number];
 
 export const SCOPE_DESCRIPTIONS: Record<OAuthScope, string> = {
   openid: "Verify your identity",
   profile: "See your name and profile picture (including avatar_url)",
   email: "See your email address",
+  offline_access: "Stay signed in and refresh access when you're away",
   yavqoid: "See your YavqoID handle",
   full_name: "See your full name",
   avatar: "See your profile picture (including avatar_url)",
