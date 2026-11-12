@@ -33,6 +33,9 @@ const groups = [
     { key: "privacy", label: "Data & privacy", href: "/privacy" },
     { key: "delete-account", label: "Delete account", href: "/account/delete" },
   ] },
+  { title: "Business", items: [
+    { key: "business", label: "Business Center", href: "/business" },
+  ] },
   { title: "Developer", items: [
     { key: "developers-oauth", label: "Developer credentials", href: "/developers/oauth" },
   ] },

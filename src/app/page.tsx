@@ -1,6 +1,7 @@
 import type { LucideIcon } from "lucide-react";
 import {
   Bell,
+  Building2,
   ChevronRight,
   CircleAlert,
   Contact,
@@ -138,6 +139,7 @@ export default async function AccountPage() {
           <div>
             <Link href="/notifications"><Bell size={18} aria-hidden="true" /> Notifications <ChevronRight size={16} aria-hidden="true" /></Link>
             <Link href="/preferences"><SlidersHorizontal size={18} aria-hidden="true" /> Preferences <ChevronRight size={16} aria-hidden="true" /></Link>
+            <Link href="/business"><Building2 size={18} aria-hidden="true" /> Business Center <ChevronRight size={16} aria-hidden="true" /></Link>
             <Link href="/developers/oauth"><Link2 size={18} aria-hidden="true" /> Developer credentials <ChevronRight size={16} aria-hidden="true" /></Link>
           </div>
         </section>

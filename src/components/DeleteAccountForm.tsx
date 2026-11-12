@@ -87,6 +87,7 @@ export default function DeleteAccountForm({
           <li>Uploaded files, videos, and account storage</li>
           <li>Saved passwords, contacts, and family membership</li>
           <li>Connected apps and OAuth access you granted</li>
+          <li>Business Center businesses you own and team memberships</li>
           <li>YavqoTV friends and wallet cards stored on this account</li>
         </ul>
         <p className="mt-4 text-[12px] leading-relaxed text-[#9aa0a6]">
