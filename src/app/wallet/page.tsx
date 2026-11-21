@@ -210,8 +210,16 @@ export default async function WalletPage({
         </section>
 
         <Link
-          href="/invoices"
+          href="/giftcard"
           className="mt-6 block rounded-2xl border border-[#3c4043] px-6 py-4 text-[14px] transition-colors hover:bg-white/5"
+        >
+          Redeem a gift card &amp; view balance
+          <span className="text-[#9aa0a6]"> →</span>
+        </Link>
+
+        <Link
+          href="/invoices"
+          className="mt-4 block rounded-2xl border border-[#3c4043] px-6 py-4 text-[14px] transition-colors hover:bg-white/5"
         >
           View payment history and invoices
           <span className="text-[#9aa0a6]"> →</span>

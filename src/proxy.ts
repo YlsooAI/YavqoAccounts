@@ -15,6 +15,7 @@ const PUBLIC_PATHS = [
   "/oauth/introspect",
   "/.well-known",
   "/api/wallet",
+  "/api/giftcard",
 ];
 
 export async function proxy(request: NextRequest) {

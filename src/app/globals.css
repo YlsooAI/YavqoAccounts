@@ -607,3 +607,23 @@ body {
   .business-card-header, .business-subpanel, .business-card-actions { padding-inline: 16px; }
   .business-form-card { padding: 18px; }
 }
+
+.giftcard-balance-card { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 16px; border: 1px solid var(--account-line); border-radius: 16px; padding: 24px; background: #fff; }
+.giftcard-balance-label { color: var(--account-muted); font-size: 13px; font-weight: 600; }
+.giftcard-balance-amount { margin-top: 6px; color: var(--account-ink); font-size: 36px; font-weight: 600; line-height: 1.15; letter-spacing: -.8px; }
+.giftcard-balance-meta { margin-top: 8px; color: var(--account-muted); font-size: 13px; }
+.giftcard-form { margin-top: 20px; }
+.account-content .giftcard-code-input { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; letter-spacing: .04em; text-transform: uppercase; }
+.giftcard-history { margin-top: 32px; }
+.account-content .giftcard-section-title { margin-bottom: 14px; font-size: 19px; font-weight: 600; }
+.giftcard-history-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 18px; padding: 17px 21px; }
+.giftcard-history-row + .giftcard-history-row { border-top: 1px solid var(--account-line); }
+.giftcard-history-info { display: grid; gap: 4px; min-width: 0; }
+.giftcard-history-code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 14px; font-weight: 600; color: var(--account-ink); overflow-wrap: anywhere; }
+.giftcard-history-date { color: var(--account-muted); font-size: 13px; }
+.giftcard-history-amount { color: #17633c; font-size: 15px; font-weight: 600; }
+@media (max-width: 560px) {
+  .giftcard-balance-card { padding: 19px; }
+  .giftcard-balance-amount { font-size: 30px; }
+  .giftcard-history-row { padding: 16px 18px; }
+}

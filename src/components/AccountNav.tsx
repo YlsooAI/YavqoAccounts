@@ -11,6 +11,7 @@ const groups = [
   ] },
   { title: "Billing", items: [
     { key: "wallet", label: "Payment methods & subscriptions", href: "/wallet" },
+    { key: "giftcard", label: "Redeem Giftcard", href: "/giftcard" },
     { key: "invoices", label: "Invoices", href: "/invoices" },
   ] },
   { title: "Social & family", items: [
